@@ -87,7 +87,6 @@ exports.registerOwner = async (req, res) => {
     }
 };
 
-
 function passwordGenTemps(){
       return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -231,15 +230,21 @@ exports.addService = async (req, res) => {
     try {
         const serviceImages = req.files.map(file => file.filename);
 
-        const service = new ServiceModel(req.body);
+        const ownerId = req.body.ownerId;   // if using auth middleware
 
-        service.serviceImages = serviceImages;
+        // Create service
+        const service = new ServiceModel({
+            ...req.body,
+            ownerId: ownerId,
+            serviceImages: serviceImages
+        });
 
         await service.save();
 
         res.status(201).json({
             success: true,
-            message: "Service Added Successfully"
+            message: "Service Added Successfully",
+            service
         });
 
     } catch (error) {
@@ -259,23 +264,29 @@ exports.updateService = async (req, res) => {
     try {
 
         const { serviceId } = req.params;
+        const { ownerId } = req.body;
 
-        console.log("id" , serviceId);
-        console.log(req.body);
+        console.log("Service Id:", serviceId);
+        console.log("Owner Id:", ownerId);
+        console.log("Body:", req.body);
 
-        const service = await ServiceModel.findById(serviceId);
+        // Find service with owner check
+        const service = await ServiceModel.findOne({
+            _id: serviceId,
+            ownerId: ownerId
+        });
 
         if (!service) {
             return res.status(404).json({
                 success: false,
-                message: "Service not found"
+                message: "Service Not Found or Unauthorized"
             });
         }
 
-        // Update text fields
+        // Update fields
         Object.assign(service, req.body);
 
-        // If new images uploaded
+        // Handle images
         if (req.files && req.files.length > 0) {
             const serviceImages = req.files.map(file => file.filename);
             service.serviceImages = serviceImages;
@@ -286,7 +297,7 @@ exports.updateService = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Service Updated Successfully",
-            data: service
+            service
         });
 
     } catch (error) {
@@ -306,78 +317,95 @@ exports.searchServices = async (req, res) => {
    try {
 
         const { serviceId } = req.params;
+        const { ownerId } = req.bod;   // send ownerId in query
 
-        console.log("id" , serviceId);
+        console.log("Service Id:", serviceId);
+        console.log("Owner Id:", ownerId);
 
-        const service = await ServiceModel.findById(serviceId);
-
-        if (!service) {
-            return res.status(404).json({
-                success: false,
-                message: "Service not found"
-            });
-        }
-        else{
-            res.status(200).json({
-            success: true,
-            message: "Show Service Successfully",
-            service : service
+        const service = await ServiceModel.findOne({
+            _id: serviceId,
+            ownerId: ownerId
         });
-
-        }
-      
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: "Error in search service",
-            error: error.message
-        });
-
-    }
-
-}
-
-exports.viewAllServices = async (req, res) => {
-
-    try{
-        const services = await ServiceModel.find();
-        
-        console.log(services);
-
-        res.status(200).json({
-          message : "services send ... !!!",
-          services : services
-        })
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: "Error in show all Objects",
-            error: error.message
-        });
-    }
-
-}
-
-exports.deleteService = async (req, res) => {
-    try {
-
-        const { serviceId } = req.params;
-
-        const service = await ServiceModel.findByIdAndDelete(serviceId);
 
         if (!service) {
             return res.status(404).json({
                 success: false,
                 message: "Service Not Found"
             });
-        }else{
-           res.status(200).json({
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Service Fetched Successfully",
+            service
+        });
+
+   } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: "Error Searching Service",
+            error: error.message
+        });
+
+   }
+
+};
+
+exports.viewAllServices = async (req, res) => {
+
+    try {
+
+        const { ownerId } = req.body;
+
+        const services = await ServiceModel.find({ ownerId: ownerId });
+
+        res.status(200).json({
+            success: true,
+            totalServices: services.length,
+            message: "Owner services fetched successfully",
+            services
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: "Error fetching services",
+            error: error.message
+        });
+
+    }
+
+};
+
+exports.deleteService = async (req, res) => {
+
+    try {
+
+        const { serviceId } = req.params;
+        const { ownerId } = req.body;
+
+        console.log("Service Id:", serviceId);
+        console.log("Owner Id:", ownerId);
+
+        const service = await ServiceModel.findOneAndDelete({
+            _id: serviceId,
+            ownerId: ownerId
+        });
+
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                message: "Service Not Found or Unauthorized"
+            });
+        }
+
+        res.status(200).json({
             success: true,
             message: "Service Deleted Successfully"
-          });
-        } 
-       
+        });
+
     } catch (error) {
 
         res.status(500).json({
@@ -385,7 +413,9 @@ exports.deleteService = async (req, res) => {
             message: "Error Deleting Service",
             error: error.message
         });
+
     }
+
 };
 
 exports.addProduct = async (req, res) => {
@@ -420,7 +450,9 @@ exports.viewAllProducts = async (req, res) => {
 
     try {
 
-        const products = await ProductModel.find();
+        const { ownerId } = req.body;
+
+        const products = await ProductModel.find({ ownerId: ownerId });
 
         res.status(200).json({
             success: true,
@@ -440,19 +472,21 @@ exports.viewAllProducts = async (req, res) => {
 
 };
 
-
 exports.searchProduct = async (req, res) => {
 
     try {
 
         const { productId } = req.params;
 
-        const product = await ProductModel.findById(productId);
+        const product = await ProductModel.findOne({
+            _id: productId,
+            ownerId: req.body.ownerId
+        });
 
         if (!product) {
             return res.status(404).json({
                 success: false,
-                message: "Product Not Found"
+                message: "Product Not Found or Unauthorized"
             });
         }
 
@@ -478,15 +512,16 @@ exports.updateProduct = async (req, res) => {
     try {
 
         const { productId } = req.params;
-
+        console.log("Product Id",productId);
         const updateData = req.body;
+        console.log("Data :", updateData);
 
         if (req.files && req.files.length > 0) {
             updateData.productImages = req.files.map(file => file.filename);
         }
 
-        const product = await ProductModel.findByIdAndUpdate(
-            productId,
+        const product = await ProductModel.findOneAndUpdate(
+            { _id: productId, ownerId: req.body.ownerId },  // added owner check
             updateData,
             { new: true }
         );
@@ -494,7 +529,7 @@ exports.updateProduct = async (req, res) => {
         if (!product) {
             return res.status(404).json({
                 success: false,
-                message: "Product Not Found"
+                message: "Product Not Found or Unauthorized"
             });
         }
 
@@ -522,12 +557,15 @@ exports.deleteProduct = async (req, res) => {
 
         const { productId } = req.params;
 
-        const product = await ProductModel.findByIdAndDelete(productId);
+        const product = await ProductModel.findOneAndDelete({
+            _id: productId,
+            ownerId: req.body.ownerId
+        });
 
         if (!product) {
             return res.status(404).json({
                 success: false,
-                message: "Product Not Found"
+                message: "Product Not Found or Unauthorized"
             });
         }
 

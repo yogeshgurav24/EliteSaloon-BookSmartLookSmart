@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const ServiceSchema = new mongoose.Schema({
 
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Owner",
+        required: true
+    },
+
     serviceName:{
         type:String,
         required:true,
