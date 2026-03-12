@@ -4,11 +4,11 @@ import "./Navbar.css";
 import {
   FaSearch,
   FaUser,
-  FaHeart,
-  FaShoppingCart,
+  // FaHeart,
+  // FaShoppingCart,
   FaBars,
   FaTimes,
-  FaPhone,
+
 } from "react-icons/fa";
 
 const Navbar = () => {
@@ -23,9 +23,9 @@ const Navbar = () => {
       {/* ===== TOP STRIP ===== */}
       <div className="top-strip">
         <div className="top-strip-content">
-          <span>Welcome To EliteSalon ✨</span>
+          <span>Welcome To EliteSalon </span>
           <div className="top-strip-contact">
-            <FaPhone /> +1 (123) 456-7890
+           <p>elitesaloon18@gmail.com</p>
           </div>
         </div>
       </div>
@@ -93,17 +93,17 @@ const Navbar = () => {
             <Link to="/shop">Shop</Link>
           </li>
 
-          <li className={isActive("/salon-locator") ? "active" : ""}>
+          {/* <li className={isActive("/salon-locator") ? "active" : ""}>
             <Link to="/salon-locator">Salon Locator</Link>
-          </li>
+          </li> */}
 
           <li className={isActive("/offers") ? "active" : ""}>
             <Link to="/offers">Offers</Link>
           </li>
 
-          <li className={isActive("/content") ? "active" : ""}>
+          {/* <li className={isActive("/content") ? "active" : ""}>
             <Link to="/content">Content Hub</Link>
-          </li>
+          </li> */}
         </ul>
 
         {/* RIGHT SECTION */}
@@ -116,17 +116,17 @@ const Navbar = () => {
             <FaUser />
           </Link>
 
-          <Link to="/wishlist" className="icon-link" title="Wishlist">
+          {/* <Link to="/wishlist" className="icon-link" title="Wishlist">
             <FaHeart />
-          </Link>
+          </Link> */}
 
-          <Link to="/cart" className="icon-link" title="Cart">
+          {/* <Link to="/cart" className="icon-link" title="Cart">
             <FaShoppingCart />
-          </Link>
+          </Link> */}
 
-          <Link to="/booking" className="book-btn">
+          {/* <Link to="/booking" className="book-btn">
             BOOK NOW
-          </Link>
+          </Link> */}
 
           {/* Mobile Menu Toggle */}
           <button

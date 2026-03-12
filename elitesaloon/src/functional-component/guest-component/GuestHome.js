@@ -151,11 +151,9 @@ const GuestHome = () => {
       <section className="products-section">
         <div className="container">
           <div className="section-header">
-            <span className="section-subtitle">Take Home</span>
+            {/* <span className="section-subtitle">Take Home</span> */}
             <h2 className="section-title">Our Products</h2>
-            <p className="section-description">
-              Premium salon-exclusive products for your beauty routine
-            </p>
+           
           </div>
 
           {/* Product Filters */}

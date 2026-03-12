@@ -3,7 +3,7 @@ import PhoneInput from "react-phone-input-2";
 import Swal from "sweetalert2";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "react-phone-input-2/lib/style.css";
-import "./CustomerForm.css";
+import "../../components/Form.css";
 import { useNavigate } from "react-router-dom";
 import useLoader from "../../hooks/useLoader";
 import CommonLoader from "../../components/CommonLoader";
@@ -211,7 +211,7 @@ const CustomerRegistration = () => {
 
       console.log("customer:", customer);
 
-      if (loading) return; // 🔒 prevent double click
+      if (loading) return; //  prevent double click
          startLoading(); 
 
 

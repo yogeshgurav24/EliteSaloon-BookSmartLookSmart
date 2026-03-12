@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./CustomerForm.css";
+import "../../components/Form.css";
 import axios from "axios";
 import usePreventBackNavigation from "../../hooks/usePreventBackNavigation";
 
