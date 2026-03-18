@@ -8,12 +8,19 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/elitesaloon')
+// mongoose.connect('mongodb://localhost:27017/elitesaloon')
+mongoose.connect('mongodb://127.0.0.1:27017/elitesaloon')
+
    .then(() => console.log('MongoDB connected'))
    .catch(err => console.log(err, 'MongoDB connection error'));
 
-//route for customer 
+//routes for customer 
 app.use('/customer', require('./routes/customerRoutes'));
+
+//routes for owner
+app.use('/owner',require('./routes/ownerRoutes'));
+
+app.use('/admin', require('./routes/adminRoutes'));
 
    
 app.listen(5000, () => {

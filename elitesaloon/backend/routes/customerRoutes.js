@@ -1,14 +1,20 @@
 const express = require('express');
 const routes  = express.Router();
-const upload = require('../middleware/upload');
+// const upload = require('../middleware/upload');
+const imageUpload = require("../utils/imageUpload");
 const CustomerController = require('../controllers/CustomerController/CustomerController');
 
-routes.post('/register', upload.single('customerProfileImage'), CustomerController.registerCustomer);
-routes.get('/login', CustomerController.loginCustomer);
+// routes.post('/register', upload.single('customerProfileImage'), CustomerController.registerCustomer);
+routes.post('/register', CustomerController.registerCustomer);
+
+routes.post('/login', CustomerController.loginCustomer);
 routes.post('/verifyotp', CustomerController.verifyOTP);
 routes.post('/forgotpassword', CustomerController.forgotPassword);
-routes.post('/matchotp', CustomerController.matchOTP);
+// routes.post('/matchotp', CustomerController.matchOTP);
 routes.post('/resetpassword', CustomerController.resetPassword);
+
+//for imsge
+routes.post('/uploadprofile', imageUpload.single('customerProfileImage'), CustomerController.uploadProfileImage);
 
 module.exports = routes;
 
