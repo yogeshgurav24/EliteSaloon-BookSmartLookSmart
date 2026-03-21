@@ -3,45 +3,79 @@ const emailSendOptimizeCode = require("../../utils/emailSendOptimizeCode");
 
 exports.approveOwner = async (req, res) =>{
 
-    const subject = "Owner Request for Elite Saloon Account ... !!!";
-    const message = "Congratulation ... !!! \n\nYour Requested is ACCEPTED by ADMIN.\n\n" +
-                    "Now you can manage your customers and products." +
-                    "Thank You\n\nEliteSaloon" ;
+    const {ownerId } = req.params;
+    const { ownerApprovedStatus } = req.body;
 
-    const { ownerEmail, ownerAccountStatus, ownerApprovedStatus } = req.body;
+    const owner = await OwnerModel.findOne({ _id : ownerId });
 
-    const owner = await OwnerModel.findOne({ ownerEmail});
+    if(owner !== null ){
 
-    if(owner !== null && 
-        owner.ownerAccountStatus === "DEACTIVE" && 
-        owner.ownerApprovedStatus === "PENDING" &&
-        owner.ownerVerified === true
-    ){
+            let wishesh = "";
+            let status = "";
+            const subject = "Owner Request for Elite Saloon Account ... !!!";
 
-        owner.ownerAccountStatus = ownerAccountStatus ;
-        owner.ownerApprovedStatus = ownerApprovedStatus ;
-        owner.ownerUpdatedAt = Date.now();
-        await owner.save()
+            if (ownerApprovedStatus === "APPROVE") {
 
-        console.log("APPROVE");
-        res.status(200).json({
-            message : "ACCEPT"
-        });
+                wishesh = "Congratulations ... ";
+                status = ownerApprovedStatus;
 
-       emailSendOptimizeCode(owner.ownerEmail, subject, message);
+                owner.ownerApprovedStatus = ownerApprovedStatus;
+                owner.ownerAccountStatus = "ACTIVE";
+                owner.ownerUpdatedAt = Date.now();
+                await owner.save();
+
+            } else {
+
+                wishesh = "Hard luck ";
+                status = ownerApprovedStatus;
+
+                owner.ownerApprovedStatus = ownerApprovedStatus;
+                owner.ownerAccountStatus = "DEACTIVE"; 
+                owner.ownerUpdatedAt = Date.now();
+                await owner.save();
+            }
+
+            let message = `${wishesh}...!!!\n\nYour request has been reviewed by ADMIN.\n\n` +
+                        `You are ${status} by ADMIN.\n\n` +
+                        `Thank You\nEliteSaloon`;
+
+            res.status(200).json({
+                message: "DONE"
+            });
+
+            emailSendOptimizeCode(owner.ownerEmail, subject, message);
         
-    }else{
-
-        if(ownerVerified === false){
-            res.status(401).json({
-            message : "You are not verify OTP"
-        });
-        }
-
-        console.log("NOT APPROVE ");
-        res.status(401).json({
-            message : "NOT ACCEPT"
-        });
     }
     
+}
+
+exports.ownerRequest = async(req,res) =>{
+
+      try {
+        const owners = await OwnerModel.find({
+            ownerVerified :true,
+            ownerAccountStatus: "DEACTIVE",
+            ownerApprovedStatus: "PENDING"
+        });
+
+        if (!owners || owners.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No pending owners found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: owners.length,
+            data: owners
+        });
+
+    } catch (error) {
+        console.error("Error fetching pending owners:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }
 }

@@ -76,10 +76,12 @@ const OwnerRequestModal = ({
               <br />
 
               <img
-                src={owner.ownerShopCertificate}
+                // src={owner.ownerShopCertificate}
+                src={`http://localhost:5000/uploads/shopImage/${owner.ownerShopCertificate}`}
                 alt="Shop Certificate"
                 className="salon-image ms-3"
                 width="150"
+              
               />
 
             </div>

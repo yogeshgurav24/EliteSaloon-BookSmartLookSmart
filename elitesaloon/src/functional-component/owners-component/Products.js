@@ -111,7 +111,7 @@ const Products = ({
             <div className="od-item-image">
               {product.productImages && product.productImages.length > 0 ? (
                 <img
-                  src={`http://localhost:5000/uploads/${product.productImages[0]}`}
+                  src={`http://localhost:5000/uploads/productImages/${product.productImages[0]}`}
                   alt={product.productName}
                   style={{ width: "100%", height: "120px", objectFit: "cover" }}
                 />

@@ -14,7 +14,8 @@ const OwnerRequests = () => {
   const fetchOwners = async () => {
     try {
 
-      const res = await axios.get("http://localhost:5000/api/owner-requests");
+      const res = await axios.get("http://localhost:5000/admin/owner-request");
+      console.log("Requests :", res.data);
 
       setOwners(res.data.data);
 
