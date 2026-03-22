@@ -364,7 +364,7 @@ const OwnerRegistration = () => {
           </div>
 
           <button className="submit-btn">
-            {loading ? "Please wait..." : "Register"}
+            {loading ? "Please wait..." : "Apply"}
           </button>
         </form>
       </div>

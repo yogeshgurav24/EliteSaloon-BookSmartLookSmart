@@ -102,20 +102,52 @@ const OwnerRequestModal = ({
               </p>
             </div>
 
-            <div className="mt-3">
-              <label className="form-label fw-bold">
-                Shop Certificate:
-              </label>
+<div className="mt-3">
+  <label className="form-label fw-bold">
+    Shop Certificate:
+  </label>
 
-              <br />
+  <br />
 
-              <img
-                src={owner.ownerShopCertificate}
-                alt="Shop Certificate"
-                className="salon-image ms-3"
-                width="150"
-              />
-            </div>
+  <img
+    src={owner.ownerShopCertificate}
+    alt="Shop Certificate"
+    className="salon-image ms-3"
+    width="150"
+  />
+</div>
+
+{/* ✅ NEW: Shop Front Photo */}
+<div className="mt-3">
+  <label className="form-label fw-bold">
+    Shop Front Photo:
+  </label>
+
+  <br />
+
+  <img
+    src={owner.shopFrontPhoto}
+    alt="Shop Front"
+    className="salon-image ms-3"
+    width="150"
+  />
+</div>
+
+{/* ✅ NEW: Shop Inside Photo */}
+<div className="mt-3">
+  <label className="form-label fw-bold">
+    Shop Inside Photo:
+  </label>
+
+  <br />
+
+  <img
+    src={owner.shopInsidePhoto}
+    alt="Shop Inside"
+    className="salon-image ms-3"
+    width="150"
+  />
+</div>
           </Col>
 
         </Row>
