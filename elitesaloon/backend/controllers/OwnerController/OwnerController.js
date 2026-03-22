@@ -38,10 +38,9 @@ exports.registerOwner = async (req, res) => {
                 return res.status(400).json({ message: "Images are required" });
             }
 
-            //Images add to request 
-            req.body.ownerShopCertificate = req.files.ownerShopCertificate[0].path;
-            req.body.shopFrontPhoto = req.files.shopFrontPhoto[0].path;
-            req.body.shopInsidePhoto = req.files.shopInsidePhoto[0].path;
+            req.body.ownerShopCertificate = req.files.ownerShopCertificate[0].filename;
+            req.body.shopFrontPhoto = req.files.shopFrontPhoto[0].filename;
+            req.body.shopInsidePhoto = req.files.shopInsidePhoto[0].filename;
 
             const owner = new OwnerModel( req.body );
 
@@ -112,7 +111,7 @@ exports.loginOwner = async(req, res) => {
 
     if(owner != null && owner.ownerVerified && 
       owner.ownerAccountStatus === "ACTIVE" &&
-      owner.ownerApprovedStatus === "ACCEPT" 
+      owner.ownerApprovedStatus === "APPROVE" 
     ){
         const isMatch = await bcrypt.compare(
                 ownerPassword,
@@ -135,7 +134,7 @@ exports.loginOwner = async(req, res) => {
         res.status(401).json({
           message: "Email does not exist",
         });
-      }else if( owner.ownerAccountStatus !== "ACTIVE" && owner.ownerApprovedStatus !== "ACCEPT") {
+      }else if( owner.ownerAccountStatus !== "ACTIVE" && owner.ownerApprovedStatus !== "APPROVE") {
         res.status(401).json({
           message: "You are not APPROVED By admin",
         });
@@ -285,16 +284,16 @@ exports.updateService = async (req, res) => {
     try {
 
         const { serviceId } = req.params;
-        const { ownerId } = req.body;
+        // const { ownerId } = req.body;
 
-        console.log("Service Id:", serviceId);
-        console.log("Owner Id:", ownerId);
-        console.log("Body:", req.body);
+        // console.log("Service Id:", serviceId);
+        // console.log("Owner Id:", ownerId);
+        // console.log("Body:", req.body);
 
         // Find service with owner check
         const service = await ServiceModel.findOne({
             _id: serviceId,
-            ownerId: ownerId
+            // ownerId: ownerId
         });
 
         if (!service) {
@@ -450,14 +449,14 @@ exports.deleteService = async (req, res) => {
     try {
 
         const { serviceId } = req.params;
-        const { ownerId } = req.body;
+        // const { ownerId } = req.body;
 
         console.log("Service Id:", serviceId);
-        console.log("Owner Id:", ownerId);
+        // console.log("Owner Id:", ownerId);
 
         const service = await ServiceModel.findOneAndDelete({
             _id: serviceId,
-            ownerId: ownerId
+            // ownerId: ownerId
         });
 
         if (!service) {
@@ -625,7 +624,7 @@ exports.deleteProduct = async (req, res) => {
 
         const product = await ProductModel.findOneAndDelete({
             _id: productId,
-            ownerId: req.body.ownerId
+            // ownerId: req.body.ownerId
         });
 
         if (!product) {
@@ -660,6 +659,7 @@ exports.addStaff = async (req, res) => {
     try {
 
         const { staffEmail } = req.body;
+        const ownerId = req.params;
 
         console.log("Request Data :", req.body);
 
@@ -681,9 +681,8 @@ exports.addStaff = async (req, res) => {
 
             const staff = new StaffModel(req.body);
 
-                req.body.staffProfile = req.file.path;
+            staff.staffProfile = req.file.filename;
             
-
             // Generate OTP
             let otp = await generateOTP();
 

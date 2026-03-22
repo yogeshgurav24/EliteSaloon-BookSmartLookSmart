@@ -96,13 +96,8 @@ const OwnerDashboard = () => {
       //   return;
       // }
 
-      // 🔹 Fetch owner profile
-      // const ownerRes = await axios.get(`/api/owner/${ownerId}`);
       const ownerRes = owner;
       setOwnerProfile(ownerRes || {});
-
-      console.log("Owner Res :", ownerRes);
-      console.log("Owner Id", ownerRes._id);
 
       const ownerId = ownerRes._id;
 
@@ -110,10 +105,6 @@ const OwnerDashboard = () => {
       const serviceRes = await axios.get(
         `http://localhost:5000/owner/allservices/${ownerId}`,
       );
-      const productRes = await axios.get(
-        `http://localhost:5000/owner/viewall-products/${ownerId}`,
-      );
-      const staffRes = await axios.get(`/api/staff/owner/${ownerId}`);
 
       // console.log("Services after Login :",serviceRes.data );
       const serviceData = Array.isArray(serviceRes.data.services)
@@ -121,11 +112,24 @@ const OwnerDashboard = () => {
         : [];
       setServices(serviceData);
 
-      const productData = Array.isArray(productRes.data) ? productRes.data : [];
+      const productRes = await axios.get(
+        `http://localhost:5000/owner/viewall-products/${ownerId}`,
+      );
+
+      // console.log("Product Resonese :", productRes.data);
+      const productData = Array.isArray(productRes.data.products)
+        ? productRes.data.products
+        : [];
+
       setProducts(productData);
 
-      const staffData = Array.isArray(staffRes.data) ? staffRes.data : [];
+      const staffRes = await axios.get(`http://localhost:5000/owner/staff-list/${ownerId}`);     
+      console.log("Staff List :", staffRes.data);
+      const staffData = Array.isArray(staffRes.data) 
+      ? staffRes.data.staff : [];
+      
       setStaff(staffData);
+
     } catch (error) {
       console.error("Dashboard Load Error:", error);
     } finally {
@@ -189,7 +193,7 @@ const OwnerDashboard = () => {
 
     try {
       if (editingService) {
-        await axios.put(`/api/services/${editingService._id}`, formData);
+        await axios.put(`http://localhost:5000/owner/update-service/${editingService._id}`, formData);
         Swal.fire("Success", "Service updated successfully", "success");
       } else {
         await axios.post(`http://localhost:5000/owner/add-service`, formData);
@@ -215,7 +219,7 @@ const OwnerDashboard = () => {
       confirmButtonText: "Yes, delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.delete(`/api/services/${id}`);
+        await axios.delete(`http://localhost:5000/owner/delete-service/${id}`);
         fetchDashboardData();
         Swal.fire("Deleted", "Service deleted successfully", "success");
       }
@@ -258,7 +262,7 @@ const OwnerDashboard = () => {
       productForm.productPreferredGender,
     );
 
-    formData.append("ownerId", localStorage.getItem("ownerId"));
+    formData.append("ownerId", owner._id);
 
     for (let i = 0; i < productForm.productImages.length; i++) {
       formData.append("productImages", productForm.productImages[i]);
@@ -266,10 +270,10 @@ const OwnerDashboard = () => {
 
     try {
       if (editingProduct) {
-        await axios.put(`/api/products/${editingProduct._id}`, formData);
+        await axios.put(`http://localhost:5000/owner/update-product/${editingProduct._id}`, formData);
         Swal.fire("Success", "Product updated successfully", "success");
       } else {
-        await axios.post(`/api/products`, formData);
+        await axios.post(`http://localhost:5000/owner/add-product`, formData);
         Swal.fire("Success", "Product added successfully", "success");
       }
 
@@ -292,7 +296,7 @@ const OwnerDashboard = () => {
       confirmButtonText: "Yes, delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.delete(`/api/products/${id}`);
+        await axios.delete(`http://localhost:5000/owner/delete-product/${id}`);
         fetchDashboardData();
         Swal.fire("Deleted", "Product deleted successfully", "success");
       }

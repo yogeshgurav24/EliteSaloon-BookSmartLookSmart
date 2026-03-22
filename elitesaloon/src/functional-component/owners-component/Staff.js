@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Swal from "sweetalert2";
-import { FiPlus, FiX, FiEdit2, FiTrash2, FiUser } from "react-icons/fi";
+import { FiPlus, FiX, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom"; // ✅ ADD
 
 const Staff = ({
   staff,
@@ -15,7 +16,23 @@ const Staff = ({
   deleteStaff,
 }) => {
   const fileInputRef = useRef(null);
+  const navigate = useNavigate(); // ✅ ADD
+
   const [selectedImage, setSelectedImage] = useState(null);
+  const [preview, setPreview] = useState("/images/defaultProfile.png");
+
+  // ================= EDIT MODE IMAGE LOAD =================
+  useEffect(() => {
+    if (editingStaff && editingStaff.staffProfile) {
+      setPreview(
+        `http://localhost:5000/uploads/staffProfiles/${editingStaff.staffProfile}`
+      );
+    } else {
+      setPreview("/images/defaultProfile.png");
+    }
+
+    setSelectedImage(null);
+  }, [editingStaff, showStaffModal]);
 
   // ================= VALIDATION =================
   const validateStaffForm = () => {
@@ -44,25 +61,44 @@ const Staff = ({
       return false;
     }
 
-    if (!staffForm.staffExperience) {
-      Swal.fire("Validation Error", "Experience is required", "warning");
+    if (!staffForm.staffAddress || !staffForm.staffAddress.trim()) {
+      Swal.fire("Validation Error", "Address is required", "warning");
       return false;
     }
 
     return true;
   };
 
+  // ================= IMAGE =================
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
 
-  // ================= CLOSE MODAL =================
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setSelectedImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // ================= CLOSE =================
   const handleClose = () => {
     setSelectedImage(null);
+    setPreview("/images/defaultProfile.png");
+
+    setStaffForm({
+      staffName: "",
+      staffEmail: "",
+      staffPhone: "",
+      staffAddress: "",
+    });
+
     closeStaffModal();
   };
 
-  // ================= SUBMIT =================
+  // ================= SUBMIT (🔥 UPDATED) =================
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -73,17 +109,21 @@ const Staff = ({
     formData.append("staffName", staffForm.staffName);
     formData.append("staffEmail", staffForm.staffEmail);
     formData.append("staffPhone", staffForm.staffPhone);
-    formData.append("staffExperience", staffForm.staffExperience);
-    formData.append("staffRole", staffForm.staffRole);
+    formData.append("staffAddress", staffForm.staffAddress);
 
-    // IMAGE FIX
     if (selectedImage) {
       formData.append("staffProfile", selectedImage);
     } else if (editingStaff?.staffProfile) {
       formData.append("existingProfile", editingStaff.staffProfile);
     }
 
-    handleStaffSubmit(formData);
+    //   IMPORTANT CHANGE (OTP FLOW)
+    handleStaffSubmit(formData, (email) => {
+      navigate("/staffotpverify", {
+        state: { staffEmail: email },
+      });
+    });
+
     setSelectedImage(null);
   };
 
@@ -97,6 +137,7 @@ const Staff = ({
           className="od-btn-add"
           onClick={() => {
             setSelectedImage(null);
+            setPreview("/images/defaultProfile.png");
             setShowStaffModal(true);
           }}
         >
@@ -114,26 +155,27 @@ const Staff = ({
           staff.map((member) => (
             <div key={member._id} className="od-item-card">
               <div className="od-item-image">
-                {member.staffProfile ? (
-                  <img
-                    src={`http://localhost:5000/${member.staffProfile}`}
-                    alt={member.staffName}
-                    style={{
-                      width: "100%",
-                      height: "120px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <FiUser />
-                )}
+                <img
+                  src={
+                    member.staffProfile
+                      ? `http://localhost:5000/uploads/staffProfiles/${member.staffProfile}`
+                      : "/images/defaultProfile.png"
+                  }
+                  alt={member.staffName}
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                  }}
+                />
               </div>
 
               <div className="od-item-content">
                 <h3 className="od-item-name">{member.staffName}</h3>
 
                 <p className="od-item-description">
-                  {member.staffRole} • {member.staffExperience} yrs
+                  {member.staffAddress}
                 </p>
 
                 <div className="od-item-meta">
@@ -192,18 +234,13 @@ const Staff = ({
                     onClick={handleImageClick}
                   >
                     <img
-                      src={
-                        selectedImage
-                          ? URL.createObjectURL(selectedImage)
-                          : editingStaff?.staffProfile
-                          ? `http://localhost:5000/${editingStaff.staffProfile}`
-                          : "https://via.placeholder.com/120"
-                      }
+                      src={preview}
                       alt="Profile"
                       style={{
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
+                        borderRadius: "50%",
                       }}
                     />
                   </div>
@@ -213,16 +250,16 @@ const Staff = ({
                     ref={fileInputRef}
                     style={{ display: "none" }}
                     accept="image/*"
-                    onChange={(e) => setSelectedImage(e.target.files[0])}
+                    onChange={handleImageChange}
                   />
                 </div>
 
-                {/* NAME */}
+                {/* FORM FIELDS */}
                 <div className="od-form-group">
                   <label>Name</label>
                   <input
                     type="text"
-                    value={staffForm.staffName}
+                    value={staffForm.staffName || ""}
                     onChange={(e) =>
                       setStaffForm({
                         ...staffForm,
@@ -232,12 +269,11 @@ const Staff = ({
                   />
                 </div>
 
-                {/* EMAIL */}
                 <div className="od-form-group">
                   <label>Email</label>
                   <input
                     type="email"
-                    value={staffForm.staffEmail}
+                    value={staffForm.staffEmail || ""}
                     onChange={(e) =>
                       setStaffForm({
                         ...staffForm,
@@ -247,12 +283,11 @@ const Staff = ({
                   />
                 </div>
 
-                {/* PHONE */}
                 <div className="od-form-group">
                   <label>Phone</label>
                   <input
                     type="text"
-                    value={staffForm.staffPhone}
+                    value={staffForm.staffPhone || ""}
                     onChange={(e) =>
                       setStaffForm({
                         ...staffForm,
@@ -262,35 +297,20 @@ const Staff = ({
                   />
                 </div>
 
-                {/* ROLE */}
                 <div className="od-form-group">
-                  <label>Role</label>
-                  <input
-                    type="text"
-                    value={staffForm.staffRole}
+                  <label>Address</label>
+                  <textarea
+                    rows="3"
+                    value={staffForm.staffAddress || ""}
                     onChange={(e) =>
                       setStaffForm({
                         ...staffForm,
-                        staffRole: e.target.value,
+                        staffAddress: e.target.value,
                       })
                     }
                   />
                 </div>
 
-                {/* EXPERIENCE */}
-                <div className="od-form-group">
-                  <label>Experience (Years)</label>
-                  <input
-                    type="number"
-                    value={staffForm.staffExperience}
-                    onChange={(e) =>
-                      setStaffForm({
-                        ...staffForm,
-                        staffExperience: e.target.value,
-                      })
-                    }
-                  />
-                </div>
               </div>
 
               <div className="od-modal-footer">
@@ -303,7 +323,7 @@ const Staff = ({
                 </button>
 
                 <button type="submit" className="od-btn-save">
-                  {editingStaff ? "Update" : "Add"} Staff
+                  {editingStaff ? "Update" : "Send OTP"} {/* 🔥 better text */}
                 </button>
               </div>
             </form>

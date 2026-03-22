@@ -5,9 +5,10 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 const OwnerRequests = () => {
-
   const [showModal, setShowModal] = useState(false);
   const [selectedOwner, setSelectedOwner] = useState(null);
+  // const [ownerApprovedStatus, setownerApprovedStatus] = useState();
+  let ownerApprovedStatus;
   const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -16,12 +17,12 @@ const OwnerRequests = () => {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://localhost:5000/api/owner-requests");
+      const res = await axios.get("http://localhost:5000/admin/owner-request");
+      console.log("Requests :", res.data);
 
       setOwners(res.data.data);
-
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch owner requests", "error");
+      console.log("Fetch owner error:", error);
     } finally {
       setLoading(false);
     }
@@ -36,35 +37,44 @@ const OwnerRequests = () => {
     setShowModal(true);
   };
 
-  // ✅ APPROVE
+  //  APPROVE
   const handleApprove = async () => {
     try {
+      // 🔥 console me check
+      // console.log("APPROVE DATA:", selectedOwner);
+
+      // setownerApprovedStatus("APPROVE");
+      ownerApprovedStatus = "APPROVE";
+      console.log("Approve Status", ownerApprovedStatus);
       await axios.put(
-        `http://localhost:5000/api/owner-requests/approve/${selectedOwner._id}`
+        `http://localhost:5000/admin/approve/${selectedOwner._id}`,
+        ownerApprovedStatus,
       );
 
       Swal.fire("Approved!", "Owner request approved", "success");
 
       setShowModal(false);
-      fetchOwners(); // refresh data
-
+      fetchOwners();
     } catch (error) {
       Swal.fire("Error", "Failed to approve request", "error");
     }
   };
 
-  // ✅ REJECT
+  // REJECT
   const handleReject = async () => {
     try {
+      // 🔥 console me check
+      // console.log("REJECT DATA:", selectedOwner);
+      ownerApprovedStatus = "Reject";
       await axios.put(
-        `http://localhost:5000/api/owner-requests/reject/${selectedOwner._id}`
+        `http://localhost:5000/owner-requests/reject/${selectedOwner._id}`,
+        ownerApprovedStatus,
       );
 
       Swal.fire("Rejected!", "Owner request rejected", "error");
 
       setShowModal(false);
-      fetchOwners(); // refresh data
-
+      fetchOwners();
     } catch (error) {
       Swal.fire("Error", "Failed to reject request", "error");
     }
@@ -73,22 +83,18 @@ const OwnerRequests = () => {
   return (
     <>
       <div className="ad-table-section">
-
         <div className="ad-section-header">
           <h2 className="ad-section-title">Owner Requests</h2>
         </div>
 
         <div className="ad-table-container">
           <div className="card-body ad-table-card-body p-0">
-
             {loading ? (
               <p className="text-center p-3">Loading...</p>
             ) : owners.length === 0 ? (
               <p className="text-center p-3">No owner requests found</p>
             ) : (
-
               <Table responsive className="ad-table mb-0">
-
                 <thead>
                   <tr>
                     <th>Sr No</th>
@@ -102,7 +108,6 @@ const OwnerRequests = () => {
                 <tbody>
                   {owners.map((owner, index) => (
                     <tr key={owner._id}>
-
                       <td>{index + 1}</td>
 
                       <td>
@@ -121,15 +126,11 @@ const OwnerRequests = () => {
                           View
                         </Button>
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
-
               </Table>
-
             )}
-
           </div>
         </div>
       </div>
