@@ -79,18 +79,37 @@ body {
 }
 
 /* Background decoration */
+/* ===== BLUR BACKGROUND IMAGE ===== */
 body::before {
+  content: '';
+  position: fixed;
+  top: -40px;
+  left: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+
+  background-image: url("/public/images/salon-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: blur(8px) brightness(0.65);
+  transform: scale(1.1);
+
+  z-index: -2;
+}
+
+/* ===== SOFT OVERLAY ===== */
+body::after {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    radial-gradient(ellipse at 10% 10%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 90%, rgba(183, 110, 121, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(128, 0, 32, 0.04) 0%, transparent 40%);
-  pointer-events: none;
+
+  background: rgba(0,0,0,0.25);
+
   z-index: -1;
 }
 

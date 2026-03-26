@@ -10,6 +10,7 @@ app.use(express.json());
 
 app.use("/uploads", express.static("C:/uploadEliteSaloonImages"));
 
+
 // Connect to MongoDB
 // mongoose.connect('mongodb://localhost:27017/elitesaloon')
 mongoose.connect('mongodb://127.0.0.1:27017/elitesaloon')
