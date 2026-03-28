@@ -30,7 +30,7 @@ const OwnerDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
 
-  const owner = location.state?.owner;
+const owner =location.state?.owner || JSON.parse(localStorage.getItem("owner"));
   // console.log("Owner Print at Dashboard :", owner);
 
   const [ownerProfile, setOwnerProfile] = useState({
@@ -123,13 +123,15 @@ const OwnerDashboard = () => {
 
       setProducts(productData);
 
-      const staffRes = await axios.get(`http://localhost:5000/owner/staff-list/${ownerId}`);     
+      const staffRes = await axios.get(
+        `http://localhost:5000/owner/staff-list/${ownerId}`,
+      );
       console.log("Staff List :", staffRes.data);
-      const staffData = Array.isArray(staffRes.data.staff) 
-      ? staffRes.data.staff : [];
-      
-      setStaff(staffData);
+      const staffData = Array.isArray(staffRes.data.staff)
+        ? staffRes.data.staff
+        : [];
 
+      setStaff(staffData);
     } catch (error) {
       console.error("Dashboard Load Error:", error);
     } finally {
@@ -192,8 +194,11 @@ const OwnerDashboard = () => {
     }
 
     try {
-     if (editingService && editingService._id) {
-        await axios.put(`http://localhost:5000/owner/update-service/${editingService._id}`, formData);
+      if (editingService && editingService._id) {
+        await axios.put(
+          `http://localhost:5000/owner/update-service/${editingService._id}`,
+          formData,
+        );
         Swal.fire("Success", "Service updated successfully", "success");
       } else {
         await axios.post(`http://localhost:5000/owner/add-service`, formData);
@@ -271,7 +276,10 @@ const OwnerDashboard = () => {
 
     try {
       if (editingProduct) {
-        await axios.put(`http://localhost:5000/owner/update-product/${editingProduct._id}`, formData);
+        await axios.put(
+          `http://localhost:5000/owner/update-product/${editingProduct._id}`,
+          formData,
+        );
         Swal.fire("Success", "Product updated successfully", "success");
       } else {
         await axios.post(`http://localhost:5000/owner/add-product`, formData);
@@ -323,7 +331,7 @@ const OwnerDashboard = () => {
   };
 
   ///staff handlesubmit
-  const handleStaffSubmit = async (formData) => {
+ const handleStaffSubmit = async (formData, callback) => {
     try {
       // ownerId add karo
       formData.append("ownerId", owner._id);
@@ -336,9 +344,15 @@ const OwnerDashboard = () => {
 
         Swal.fire("Success", "Staff updated successfully", "success");
       } else {
+        const res = await axios.post(
+          `http://localhost:5000/owner/add-staff/${owner._id}`,
+          formData,
+        );
+      const email = res.data.staffEmail;
 
-        const res = await axios.post(`http://localhost:5000/owner/add-staff/${owner._id}`, formData);
-        const email = res.data.staffEmail ;
+if (callback) {
+  callback(email);
+}
         // console.log("Staff Receive :", res.data.staffEmail);
 
         // if(res.ok)
@@ -506,13 +520,13 @@ const OwnerDashboard = () => {
                   <div className="od-stat-value">{staff.length}</div>
                   <div className="od-stat-label">Staff Members</div>
                 </div>
-                <div className="od-stat-card">
+                {/* <div className="od-stat-card">
                   <div className="od-stat-icon">
                     <FiDollarSign />
                   </div>
                   <div className="od-stat-value">₹256</div>
                   <div className="od-stat-label">Total Customers</div>
-                </div>
+                </div> */}
               </div>
               <div className="od-section">
                 <div className="od-section-header">
@@ -527,43 +541,78 @@ const OwnerDashboard = () => {
                     <FiPlus /> Add Service
                   </button>
                 </div>
-
                 <div className="od-card-grid">
-                  {services.slice(0, 3).map((service) => (
-                    <div key={service._id} className="od-item-card">
-                      <div
-                        className="od-item-image"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "40px",
-                          color: "#ccc",
-                        }}
-                      >
-                        <FiScissors />
-                      </div>
-                      <div className="od-item-content">
-                        <span
-                          className={`od-item-category ${service.servicePreferredGender?.toLowerCase()}`}
-                        >
-                          {getCategoryLabel(service.servicePreferredGender)}
-                        </span>
-                        <h3 className="od-item-name">{service.serviceName}</h3>
-                        <p className="od-item-description">
-                          {service.serviceDescription}
-                        </p>
-                        <div className="od-item-meta">
-                          <div className="od-item-price">
-                            ₹{service.servicePrice}
-                          </div>
-                          <div className="od-item-duration">
-                            <FiClock /> {service.serviceDuration} min
+                  {services.slice(0, 3).map((service) => {
+                    console.log("Service Data:", service);
+                    console.log("Service Images:", service.serviceImages);
+
+                    return (
+                      <div key={service._id} className="od-item-card">
+                        {/* IMAGE SECTION */}
+                        <div className="od-item-image">
+                          {service.serviceImages &&
+                          service.serviceImages.length > 0 ? (
+                            <img
+                              src={`http://localhost:5000/uploads/serviceImages/${service.serviceImages[0]}`}
+                              alt="service"
+                              style={{
+                                width: "100%",
+                                height: "150px",
+                                objectFit: "cover",
+                                borderRadius: "10px",
+                              }}
+                              onError={(e) => {
+                                console.log(
+                                  "Image load error:",
+                                  service.serviceImages[0],
+                                );
+                                e.target.style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "150px",
+                                fontSize: "40px",
+                                color: "#ccc",
+                              }}
+                            >
+                              <FiScissors />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* CONTENT */}
+                        <div className="od-item-content">
+                          <span
+                            className={`od-item-category ${service.servicePreferredGender?.toLowerCase()}`}
+                          >
+                            {getCategoryLabel(service.servicePreferredGender)}
+                          </span>
+
+                          <h3 className="od-item-name">
+                            {service.serviceName}
+                          </h3>
+
+                          <p className="od-item-description">
+                            {service.serviceDescription}
+                          </p>
+
+                          <div className="od-item-meta">
+                            <div className="od-item-price">
+                              ₹{service.servicePrice}
+                            </div>
+                            <div className="od-item-duration">
+                              <FiClock /> {service.serviceDuration} min
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </>

@@ -27,6 +27,8 @@ const OwnerLogin = () => {
     let err = {};
 if (!form.ownerEmail.trim()) {
   err.ownerEmail = "Email is required";
+} else if (!/\S+@\S+\.\S+/.test(form.ownerEmail)) {
+  err.ownerEmail = "Enter valid email";
 }
 
 if (!form.ownerPassword.trim()) {
@@ -91,14 +93,19 @@ if (!form.ownerPassword.trim()) {
         }
       );
 
-      const data = await response.json();
+   let data;
+try {
+  data = await response.json();
+} catch {
+  data = {};
+}
 
       const owner = data.owner;
 
       console.log("Find owner :", data.message);
 
       if (response.ok) {
-
+localStorage.setItem("owner", JSON.stringify(owner));
         Swal.fire({
           icon: "success",
           title: "Login Successful 🎉",
@@ -153,7 +160,7 @@ if (!form.ownerPassword.trim()) {
           <div className="form-group">
 
             <input
-              type="text"
+              type="email"
               name="ownerEmail"
               placeholder="Email"
               value={form.ownerEmail}

@@ -22,17 +22,27 @@ const Staff = ({
   const [preview, setPreview] = useState("/images/defaultProfile.png");
 
   // ================= EDIT MODE IMAGE LOAD =================
-  useEffect(() => {
-    if (editingStaff && editingStaff.staffProfile) {
-      setPreview(
-        `http://localhost:5000/uploads/staffProfiles/${editingStaff.staffProfile}`
-      );
-    } else {
-      setPreview("/images/defaultProfile.png");
-    }
+ // ================= EDIT MODE IMAGE LOAD =================
+useEffect(() => {
+  if (editingStaff && editingStaff.staffProfile) {
+    setPreview(
+      `http://localhost:5000/uploads/staffProfiles/${editingStaff.staffProfile}`
+    );
+  } else {
+    setPreview("/images/defaultProfile.png");
+  }
 
-    setSelectedImage(null);
-  }, [editingStaff, showStaffModal]);
+  setSelectedImage(null);
+}, [editingStaff, showStaffModal]);
+
+// ✅ ADD THIS BELOW
+useEffect(() => {
+  return () => {
+    if (preview && preview.startsWith("blob:")) {
+      URL.revokeObjectURL(preview);
+    }
+  };
+}, [preview]);
 
   // ================= VALIDATION =================
   const validateStaffForm = () => {
@@ -74,14 +84,46 @@ const Staff = ({
     fileInputRef.current.click();
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+ const handleImageChange = (e) => {
+  const file = e.target.files[0];
 
-    if (file) {
-      setSelectedImage(file);
-      setPreview(URL.createObjectURL(file));
+  if (!file) return;
+
+  // ✅ File type check
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    Swal.fire("Invalid Image", "Only JPG, PNG, WEBP allowed", "error");
+    return;
+  }
+
+  // ✅ File size check (2MB)
+  const maxSize = 2 * 1024 * 1024;
+  if (file.size > maxSize) {
+    Swal.fire("File Too Large", "Image must be less than 2MB", "error");
+    return;
+  }
+
+  // ✅ Image preview + dimension check
+  const img = new Image();
+  const imageUrl = URL.createObjectURL(file);
+
+  img.src = imageUrl;
+
+  img.onload = () => {
+    if (img.width < 100 || img.height < 100) {
+      Swal.fire(
+        "Small Image",
+        "Image must be at least 100x100 pixels",
+        "error"
+      );
+      return;
     }
+
+    // ✅ set state
+    setSelectedImage(file);
+    setPreview(imageUrl);
   };
+};
 
   // ================= CLOSE =================
   const handleClose = () => {
