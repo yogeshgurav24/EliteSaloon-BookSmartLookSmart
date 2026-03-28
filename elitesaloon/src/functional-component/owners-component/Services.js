@@ -174,9 +174,11 @@ const Service = ({
                   alt={service.serviceName}
                   style={{
                     width: "100%",
-                    height: "150px",
                     objectFit: "cover",
-                    borderRadius: "10px",
+                    objectPosition: "top",
+                    display: "block",
+                    borderTopLeftRadius: "15px",
+                    borderTopRightRadius: "15px",
                   }}
                 />
               ) : (
