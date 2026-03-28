@@ -36,8 +36,12 @@ import OwnerForgotPassword from "./functional-component/owners-component/OwnerFo
 import OwnerResetOtp from "./functional-component/owners-component/OwnerResetOtp";
 import OwnerResetPassword from "./functional-component/owners-component/OwnerResetPassword";
 
+
+
+
 // Admin
 import AdminDashboard from "./functional-component/admin-component/AdminDashboard";
+import StaffOtpVerify from "./functional-component/owners-component/StaffOtpVerify";
 
 function AppContent() {
   const location = useLocation();
@@ -62,6 +66,7 @@ function AppContent() {
     "/admindashboard",
     "/ownerforgotpassword",
     "/ownerresetotp",
+    "/staffotpveryfy",
     "/ownerresetpassword",
   ];
 
@@ -106,6 +111,8 @@ function AppContent() {
         {/* OWNER FORGOT PASSWORD */}
         <Route path="/ownerforgotpassword" element={<OwnerForgotPassword />} />
         <Route path="/ownerresetotp" element={<OwnerResetOtp />} />
+        <Route path="/staffotpverify" element={<StaffOtpVerify />} />
+
         <Route path="/ownerresetpassword" element={<OwnerResetPassword />} />
       </Routes>
     </>

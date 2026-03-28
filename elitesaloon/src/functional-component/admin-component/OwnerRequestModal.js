@@ -9,7 +9,6 @@ const OwnerRequestModal = ({
   onApprove,
   onReject,
 }) => {
-
   const [loading, setLoading] = useState(false);
 
   if (!owner) return null;
@@ -49,16 +48,18 @@ const OwnerRequestModal = ({
   };
 
   return (
-    <Modal show={show} onHide={!loading ? handleClose : null} size="lg" centered>
-
+    <Modal
+      show={show}
+      onHide={!loading ? handleClose : null}
+      size="lg"
+      centered
+    >
       <Modal.Header closeButton>
         <Modal.Title>Owner Registration Details</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-
         <Row>
-
           <Col md={6}>
             <h6 className="text-primary mb-3">Personal Information</h6>
 
@@ -103,9 +104,7 @@ const OwnerRequestModal = ({
             </div>
 
             <div className="mt-3">
-              <label className="form-label fw-bold">
-                Shop Certificate:
-              </label>
+              <label className="form-label fw-bold">Shop Certificate:</label>
 
               <br />
 
@@ -115,22 +114,71 @@ const OwnerRequestModal = ({
                 alt="Shop Certificate"
                 className="salon-image ms-3"
                 width="150"
-              
               />
+              <a
+                href={`http://localhost:5000/uploads/shopImage/${owner.ownerShopCertificate}`}
+                download
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button size="sm" className="mt-2 ms-3">
+                 View
+                </Button>
+              </a>
+            </div>
+            {/* ✅ Shop Front Photo */}
+            <div className="mt-3">
+              <label className="form-label fw-bold">Shop Front Photo:</label>
+
+              <br />
+
+              <img
+                src={`http://localhost:5000/uploads/shopImage/${owner.shopFrontPhoto}`}
+                alt="Shop Front"
+                className="salon-image ms-3"
+                width="150"
+              />
+              <a
+                href={`http://localhost:5000/uploads/shopImage/${owner.shopFrontPhoto}`}
+                download
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button size="sm" className="mt-2 ms-3">
+                  View
+                </Button>
+              </a>
+            </div>
+
+            {/* ✅ Shop Inside Photo */}
+            <div className="mt-3">
+              <label className="form-label fw-bold">Shop Inside Photo:</label>
+
+              <br />
+
+              <img
+                src={`http://localhost:5000/uploads/shopImage/${owner.shopInsidePhoto}`}
+                alt="Shop Inside"
+                className="salon-image ms-3"
+                width="150"
+              />
+              <a
+                href={`http://localhost:5000/uploads/shopImage/${owner.shopInsidePhoto}`}
+                download
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button size="sm" className="mt-2 ms-3">
+                  View
+                </Button>
+              </a>
             </div>
           </Col>
-
         </Row>
-
       </Modal.Body>
 
       <Modal.Footer>
-
-        <Button
-          variant="secondary"
-          onClick={handleClose}
-          disabled={loading}
-        >
+        <Button variant="secondary" onClick={handleClose} disabled={loading}>
           Cancel
         </Button>
 
@@ -142,16 +190,10 @@ const OwnerRequestModal = ({
           {loading ? "Processing..." : "Approve"}
         </Button>
 
-        <Button
-          variant="danger"
-          onClick={handleRejectClick}
-          disabled={loading}
-        >
+        <Button variant="danger" onClick={handleRejectClick} disabled={loading}>
           {loading ? "Processing..." : "Reject"}
         </Button>
-
       </Modal.Footer>
-
     </Modal>
   );
 };
