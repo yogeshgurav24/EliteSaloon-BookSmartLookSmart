@@ -41,7 +41,7 @@ const OwnerProfile = ({ ownerProfile, setOwnerProfile }) => {
         formData.append("ownerProfileImage", selectedImage);
       }
 
-      const res = await axios.put("/api/owner", formData, {
+      const res = await axios.put(`http://localhost:5000/owner/update-owner/${ownerProfile._id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
