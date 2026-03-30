@@ -472,7 +472,7 @@ gap:10px;
 
 .od-item-image {
   width: 100%;
-  height: 220px;   /* thoda height badhao */
+  height: 220px;   
   overflow: hidden;
   background: #f8f8f8;
   display: flex;
@@ -493,21 +493,20 @@ gap:10px;
 }
 
 
-/* General styling for both (Keep this) */
 .od-item-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Default for Services */
+  object-fit: cover; 
 }
 
-/* Specific styling ONLY for Products */
+
 .od-product-card .od-item-image img {
   object-fit: contain; 
-  padding: 15px; /* Gives the bottle some space */
-  background-color: #fcfcfc; /* Optional: slightly different bg for products */
+  padding: 15px; 
+  background-color: #fcfcfc; 
 }
 
-/* Ensure the container height is consistent */
+
 .od-product-card .od-item-image {
   height: 220px; 
   display: flex;
@@ -639,9 +638,9 @@ gap:10px;
 
 .od-item-meta {
   display: flex;
-  flex-direction: column; /* stack email & phone vertically */
-  gap: 4px; /* optional spacing */
-  align-items: flex-start; /* align left */
+  flex-direction: column; 
+  gap: 4px; 
+  align-items: flex-start; 
 }
 
 .od-item-price {
@@ -812,17 +811,16 @@ gap:10px;
 
 /* --- STAFF CARD FIX START --- */
 
-/* Card container ko fix height aur flex banayein */
 .od-item-card.od-staff-custom {
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
-  min-height: 460px !important; /* Isse cards ek barabar dikhenge */
+  min-height: 460px !important; 
   background: white;
   border-radius: 16px;
 }
 
-/* Content area ko expand karein taaki buttons niche chale jayein */
+
 .od-item-card.od-staff-custom .od-item-content {
   display: flex !important;
   flex-direction: column !important;
@@ -830,13 +828,11 @@ gap:10px;
   padding: 20px;
 }
 
-/* Address aur details wala section */
 .od-item-card.od-staff-custom .od-item-meta {
   flex: 1 !important; /* Ye bachi hui space le lega */
   margin-bottom: 15px;
 }
 
-/* Buttons ko hamesha bottom par lock karein */
 .od-item-card.od-staff-custom .od-item-actions {
   margin-top: auto !important; /* Ye sabse zaruri line hai */
   padding-top: 15px;

@@ -34,7 +34,7 @@ const OwnerProfile = ({ ownerProfile, setOwnerProfile }) => {
       formData.append("ownerShopPincode", ownerProfile.ownerShopPincode || "");
       formData.append(
         "ownerShopDistrict",
-        ownerProfile.ownerShopDistrict || ""
+        ownerProfile.ownerShopDistrict || "",
       );
 
       if (selectedImage) {
@@ -88,13 +88,13 @@ const OwnerProfile = ({ ownerProfile, setOwnerProfile }) => {
           onClick={handleImageClick}
           style={{ position: "relative", cursor: "pointer" }}
         >
-
-    
           <img
-           src={
-                ownerProfile.ownerProfileImage === "defaultProfile.png"
-                ? "http://localhost:5000/uploads/default/defaultProfile.png"
-                : `http://localhost:5000/uploads/ownerProfile/${ownerProfile.ownerProfileImage}`
+            src={
+              ownerProfile.ownerProfileImage?.startsWith("data:")
+                ? ownerProfile.ownerProfileImage
+                : ownerProfile.ownerProfileImage === "defaultProfile.png"
+                  ? "http://localhost:5000/uploads/default/defaultProfile.png"
+                  : `http://localhost:5000/uploads/ownerProfile/${ownerProfile.ownerProfileImage}`
             }
             alt="Profile"
             className="od-profile-avatar"
@@ -126,18 +126,25 @@ const OwnerProfile = ({ ownerProfile, setOwnerProfile }) => {
         <div className="od-profile-form">
           {[
             { label: "Owner Name", value: "ownerName" },
-            { label: "Email", value: "ownerEmail", type: "email" },
+            {
+              label: "Email",
+              value: "ownerEmail",
+              type: "email",
+              readOnly: true,
+            },
             { label: "Mobile", value: "ownerMobile" },
             { label: "Shop Name", value: "ownerShopName" },
-            { label: "City", value: "ownerShopCity" },
-            { label: "State", value: "ownerShopState" },
+            { label: "City", value: "ownerShopCity", readOnly: true },
+            { label: "State", value: "ownerShopState", readOnly: true },
           ].map((field) => (
             <div className="od-form-group" key={field.value}>
               <label>{field.label}</label>
               <input
                 type={field.type || "text"}
                 value={ownerProfile[field.value]}
+                readOnly={field.readOnly || false} // 🔥 yaha change
                 onChange={(e) =>
+                  !field.readOnly && // 🔥 prevent change
                   setOwnerProfile({
                     ...ownerProfile,
                     [field.value]: e.target.value,
