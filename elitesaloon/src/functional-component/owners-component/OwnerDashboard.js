@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
 import Swal from "sweetalert2";
 import axios from "axios";
 import "./OwnerDashboard.css";
@@ -26,11 +27,13 @@ import {
 
 const OwnerDashboard = () => {
   const location = useLocation();
+
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
 
-const owner =location.state?.owner || JSON.parse(localStorage.getItem("owner"));
+  const owner =
+    location.state?.owner || JSON.parse(localStorage.getItem("owner"));
   // console.log("Owner Print at Dashboard :", owner);
 
   const [ownerProfile, setOwnerProfile] = useState({
@@ -83,20 +86,19 @@ const owner =location.state?.owner || JSON.parse(localStorage.getItem("owner"));
     staffName: "",
     staffEmail: "",
     staffPhone: "",
-    staffAddress:"",
+    staffAddress: "",
   });
 
   const fetchDashboardData = useCallback(async () => {
     try {
-
-       // if (!ownerId) {
+      // if (!ownerId) {
       //   navigate("/"); // agar ownerId nahi hai to redirect
       //   return;
       // }
 
       const ownerRes = owner;
       setOwnerProfile(ownerRes || {});
-      
+
       const ownerId = ownerRes._id;
 
       // 🔹 Fetch other dashboard data
@@ -329,7 +331,7 @@ const owner =location.state?.owner || JSON.parse(localStorage.getItem("owner"));
   };
 
   ///staff handlesubmit
- const handleStaffSubmit = async (formData, callback) => {
+  const handleStaffSubmit = async (formData, callback) => {
     try {
       // ownerId add karo
       formData.append("ownerId", owner._id);
@@ -346,11 +348,11 @@ const owner =location.state?.owner || JSON.parse(localStorage.getItem("owner"));
           `http://localhost:5000/owner/add-staff/${owner._id}`,
           formData,
         );
-      const email = res.data.staffEmail;
+        const email = res.data.staffEmail;
 
-if (callback) {
-  callback(email);
-}
+        if (callback) {
+          callback(email);
+        }
         // console.log("Staff Receive :", res.data.staffEmail);
 
         // if(res.ok)
@@ -480,12 +482,12 @@ if (callback) {
             </button>
             <div className="od-profile-dropdown">
               <img
-                // src="https://via.placeholder.com/45"
-                // src= {`http://localhost:5000/uploads/ownerProfile/${owner.ownerProfileImage}`} 
-                 src={
-                        owner.ownerProfileImage === "defaultProfile.png"
-                          ? "http://localhost:5000/uploads/default/defaultProfile.png"
-                          : `http://localhost:5000/uploads/ownerProfile/${owner.ownerProfileImage}`
+                src={
+                  ownerProfile.ownerProfileImage?.startsWith("data:")
+                    ? ownerProfile.ownerProfileImage
+                    : ownerProfile.ownerProfileImage === "defaultProfile.png"
+                      ? "http://localhost:5000/uploads/default/defaultProfile.png"
+                      : `http://localhost:5000/uploads/ownerProfile/${ownerProfile.ownerProfileImage}`
                 }
                 alt="Profile"
                 className="od-profile-img"
@@ -524,13 +526,7 @@ if (callback) {
                   <div className="od-stat-value">{staff.length}</div>
                   <div className="od-stat-label">Staff Members</div>
                 </div>
-                {/* <div className="od-stat-card">
-                  <div className="od-stat-icon">
-                    <FiDollarSign />
-                  </div>
-                  <div className="od-stat-value">₹256</div>
-                  <div className="od-stat-label">Total Customers</div>
-                </div> */}
+              
               </div>
               <div className="od-section">
                 <div className="od-section-header">
@@ -559,7 +555,6 @@ if (callback) {
                             <img
                               src={`http://localhost:5000/uploads/serviceImages/${service.serviceImages[0]}`}
                               alt="service"
-                             
                               onError={(e) => {
                                 console.log(
                                   "Image load error:",

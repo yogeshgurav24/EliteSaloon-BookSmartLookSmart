@@ -25,7 +25,7 @@ const Staff = ({
   const [preview, setPreview] = useState("/images/defaultProfile.png");
 
   // ================= EDIT MODE IMAGE LOAD =================
-  // ================= EDIT MODE IMAGE LOAD =================
+ 
   useEffect(() => {
     if (editingStaff && editingStaff.staffProfile) {
       setPreview(
@@ -38,7 +38,7 @@ const Staff = ({
     setSelectedImage(null);
   }, [editingStaff, showStaffModal]);
 
-  // ✅ ADD THIS BELOW
+  
   useEffect(() => {
     return () => {
       if (preview && preview.startsWith("blob:")) {
@@ -92,21 +92,21 @@ const Staff = ({
 
     if (!file) return;
 
-    // ✅ File type check
+    
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
       Swal.fire("Invalid Image", "Only JPG, PNG, WEBP allowed", "error");
       return;
     }
 
-    // ✅ File size check (2MB)
+   
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       Swal.fire("File Too Large", "Image must be less than 2MB", "error");
       return;
     }
 
-    // ✅ Image preview + dimension check
+
     const img = new Image();
     const imageUrl = URL.createObjectURL(file);
 
@@ -122,7 +122,7 @@ const Staff = ({
         return;
       }
 
-      // ✅ set state
+      //  set state
       setSelectedImage(file);
       setPreview(imageUrl);
     };
@@ -209,7 +209,7 @@ const Staff = ({
           </p>
         ) : (
           staff.map((member) => (
-           <div key={member._id} className="od-item-card od-staff-custom">
+            <div key={member._id} className="od-item-card od-staff-custom">
               <div className="od-item-image">
                 <img
                   src={
@@ -228,39 +228,39 @@ const Staff = ({
               </div>
 
               <div className="od-item-content">
-  {/* Staff Name */}
-  <h3 className="od-item-name">{member.staffName}</h3>
+                {/* Staff Name */}
+                <h3 className="od-item-name">{member.staffName}</h3>
 
-  {/* Staff Details with Labels */}
-  <div className="od-item-meta">
-    <div>
-      <strong>Email:</strong> {member.staffEmail}
-    </div>
-    <div>
-      <strong>Phone:</strong> {member.staffPhone}
-    </div>
-    <div>
-      <strong>Address:</strong> {member.staffAddress}
-    </div>
-  </div>
+                {/* Staff Details with Labels */}
+                <div className="od-item-meta">
+                  <div>
+                    <strong>Email:</strong> {member.staffEmail}
+                  </div>
+                  <div>
+                    <strong>Phone:</strong> {member.staffPhone}
+                  </div>
+                  <div>
+                    <strong>Address:</strong> {member.staffAddress}
+                  </div>
+                </div>
 
-  {/* Action Buttons */}
-  <div className="od-item-actions">
-    <button
-      className="od-btn od-btn-edit"
-      onClick={() => openEditStaff(member)}
-    >
-      <FiEdit2 /> Edit
-    </button>
+                {/* Action Buttons */}
+                <div className="od-item-actions">
+                  <button
+                    className="od-btn od-btn-edit"
+                    onClick={() => openEditStaff(member)}
+                  >
+                    <FiEdit2 /> Edit
+                  </button>
 
-    <button
-      className="od-btn od-btn-delete"
-      onClick={() => deleteStaff(member._id)}
-    >
-      <FiTrash2 /> Delete
-    </button>
-  </div>
-</div>
+                  <button
+                    className="od-btn od-btn-delete"
+                    onClick={() => deleteStaff(member._id)}
+                  >
+                    <FiTrash2 /> Delete
+                  </button>
+                </div>
+              </div>
             </div>
           ))
         )}
@@ -335,7 +335,9 @@ const Staff = ({
                   <input
                     type="email"
                     value={staffForm.staffEmail || ""}
+                    readOnly={!!editingStaff}
                     onChange={(e) =>
+                      !editingStaff &&
                       setStaffForm({
                         ...staffForm,
                         staffEmail: e.target.value,

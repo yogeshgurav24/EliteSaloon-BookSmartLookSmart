@@ -89,7 +89,7 @@ const CustomerLogin = () => {
       const data = await response.json();
       const customer = data.customer;
 
-      console.log("Find customer :", data.message);
+      // console.log("Find customer :", data.message);
 
       if (response.ok) {
 
@@ -101,7 +101,7 @@ const CustomerLogin = () => {
 
         console.log("Login Success:", data.customer);
 
-        navigate("/customerdashboard");
+        navigate("/customerdashboard", { state: { customer } });
 
       } else {
 

@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./CustomerDashboard.css";
-import { Link, useNavigate } from "react-router-dom";
+import AppointmentBook from "./AppointmentBook";
+import CustomerProfile from "./CustomerProfile";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import {
   FaUser,
   FaCalendarAlt,
@@ -18,48 +21,49 @@ import {
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("overview");
-//   const [showEditProfile, setShowEditProfile] = useState(false);
+  const location = useLocation();
 
-  // Mock customer data
-  const customer = {
-    name: "Priya Sharma",
-    email: "priya.sharma@email.com",
-    phone: "+91 98765 43210",
-    memberSince: "January 2023",
-    loyaltyPoints: 2450,
-    membershipTier: "Gold Member",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+  
+  const [activeSection, setActiveSection] = useState("overview");
+  //   const [showEditProfile, setShowEditProfile] = useState(false);
+
+//  const [customer, setCustomer] = useState({
+//   name: "Priya Sharma",
+//   email: "priya.sharma@email.com",
+//   phone: "+91 98765 43210",
+//   memberSince: "January 2023",
+//   avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+// });
+
+const [customer, setCustomer] = useState(location.state?.customer || {});
+
+const [appointments, setAppointments] = useState([]);
+useEffect(() => {
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/appointment/my"); // 👈 apni API
+      const data = await res.json();
+      setAppointments(data);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
   };
 
-  // Mock appointments
-  const appointments = [
-    {
-      id: 1,
-      service: "Hair Coloring",
-      date: "2024-02-15",
-      time: "2:00 PM",
-      status: "completed",
-      price: "₹3500",
-    },
-    {
-      id: 2,
-      service: "Bridal Makeup",
-      date: "2024-03-20",
-      time: "10:00 AM",
-      status: "upcoming",
-      price: "₹15000",
-    },
-    {
-      id: 3,
-      service: "Body Spa",
-      date: "2024-02-28",
-      time: "4:00 PM",
-      status: "completed",
-      price: "₹2500",
-    },
-  ];
+  fetchAppointments();
+}, []);
+   const getStatusLabel = (status) => {
+    switch (status) {
+      case "CONFIRMED":
+        return "Upcoming";
+      case "COMPLETED":
+        return "Completed";
+      case "CANCELLED":
+        return "Cancelled";
+      default:
+        return status;
+    }
+  };
+
 
   // Mock saved services
   const savedServices = [
@@ -111,15 +115,21 @@ const CustomerDashboard = () => {
     <div className="dashboard-sidebar">
       <div className="sidebar-header">
         <div className="customer-avatar">
-          <img src={customer.avatar} alt={customer.name} />
-          <span className="membership-badge">{customer.membershipTier}</span>
+          {/* <img src={customer.avatar} alt={customer.name} /> */}
+           <img
+           src={
+                customer?.customerProfileImage?.startsWith("data:")
+                  ? customer.customerProfileImage
+                  : customer?.customerProfileImage === "defaultProfile.png" || !customer?.customerProfileImage
+                    ? "http://localhost:5000/uploads/default/defaultProfile.png"
+                    : `http://localhost:5000/uploads/customerProfile/${customer.customerProfileImage}`
+           }
+        
+           />
         </div>
-        <h3>{customer.name}</h3>
-        <p>{customer.email}</p>
-        <div className="loyalty-points">
-          <span className="points-value">{customer.loyaltyPoints}</span>
-          <span className="points-label">Loyalty Points</span>
-        </div>
+        <h3>{customer.customerName}</h3>
+        <p>{customer.customerEmail}</p>
+       
       </div>
 
       <nav className="sidebar-nav">
@@ -172,7 +182,7 @@ const CustomerDashboard = () => {
   const renderOverview = () => (
     <div className="dashboard-content">
       <div className="content-header">
-        <h2>Welcome back, {customer.name.split(" ")[0]}!</h2>
+        <h2>Welcome back, {customer.customerName}!</h2>
         <p>Here's what's happening with your account</p>
       </div>
 
@@ -184,7 +194,10 @@ const CustomerDashboard = () => {
           </div>
           <div className="stat-info">
             <span className="stat-value">
-              {appointments.filter((a) => a.status === "upcoming").length}
+              {
+                appointments.filter((a) => a.appointmentStatus === "CONFIRMED")
+                  .length
+              }
             </span>
             <span className="stat-label">Upcoming Appointments</span>
           </div>
@@ -195,7 +208,10 @@ const CustomerDashboard = () => {
           </div>
           <div className="stat-info">
             <span className="stat-value">
-              {appointments.filter((a) => a.status === "completed").length}
+              {
+                appointments.filter((a) => a.appointmentStatus === "COMPLETED")
+                  .length
+              }
             </span>
             <span className="stat-label">Completed Visits</span>
           </div>
@@ -233,27 +249,30 @@ const CustomerDashboard = () => {
         </div>
         <div className="appointments-list">
           {appointments
-            .filter((a) => a.status === "upcoming")
+            .filter((a) => a.appointmentStatus === "CONFIRMED")
             .map((apt) => (
-              <div key={apt.id} className="appointment-item">
+              <div key={apt._id} className="appointment-item">
                 <div className="appointment-info">
-                  <h4>{apt.service}</h4>
+                  <h4>{apt.services?.map((s) => s.serviceName).join(", ")}</h4>
                   <div className="appointment-details">
                     <span>
-                      <FaCalendarAlt /> {apt.date}
+                      <FaCalendarAlt /> {apt.appointmentDate}
                     </span>
                     <span>
-                      <FaClock /> {apt.time}
+                      <FaClock /> {apt.startTime} - {apt.endTime}
                     </span>
                   </div>
                 </div>
                 <div className="appointment-actions">
-                  <span className="appointment-price">{apt.price}</span>
-                  <span className="status-badge upcoming">Upcoming</span>
+                  <span className="appointment-price">₹{apt.totalPrice}</span>
+                <span className={`status-badge ${apt.appointmentStatus.toLowerCase()}`}>
+ {getStatusLabel(apt.appointmentStatus)}
+</span>
                 </div>
               </div>
             ))}
-          {appointments.filter((a) => a.status === "upcoming").length === 0 && (
+          {appointments.filter((a) => a.appointmentStatus === "CONFIRMED")
+            .length === 0 && (
             <p className="no-data">No upcoming appointments</p>
           )}
         </div>
@@ -278,52 +297,6 @@ const CustomerDashboard = () => {
             <FaShoppingBag /> Browse Products
           </button>
         </div>
-      </div>
-    </div>
-  );
-
-  const renderAppointments = () => (
-    <div className="dashboard-content">
-      <div className="content-header">
-        <h2>My Appointments</h2>
-        <button className="btn-primary" onClick={() => navigate("/booking")}>
-          <FaPlus /> Book New
-        </button>
-      </div>
-
-      <div className="appointments-full-list">
-        {appointments.map((apt) => (
-          <div key={apt.id} className="appointment-card">
-            <div className="appointment-main">
-              <h4>{apt.service}</h4>
-              <div className="appointment-meta">
-                <span>
-                  <FaCalendarAlt /> {apt.date}
-                </span>
-                <span>
-                  <FaClock /> {apt.time}
-                </span>
-              </div>
-            </div>
-            <div className="appointment-status">
-              <span className={`status-badge ${apt.status}`}>
-                {apt.status === "completed" ? "Completed" : "Upcoming"}
-              </span>
-              <span className="appointment-price">{apt.price}</span>
-            </div>
-            <div className="appointment-actions">
-              {apt.status === "completed" && (
-                <button
-                  className="btn-outline"
-                  onClick={() => setActiveSection("feedback")}
-                >
-                  <FaStar /> Review
-                </button>
-              )}
-              <button className="btn-text">View Details</button>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -456,97 +429,24 @@ const CustomerDashboard = () => {
     </div>
   );
 
-  const renderProfile = () => (
-    <div className="dashboard-content">
-      <div className="content-header">
-        <h2>Profile Settings</h2>
-      </div>
 
-      <div className="profile-section">
-        <div className="profile-card">
-          <div className="profile-header">
-            <img
-              src={customer.avatar}
-              alt={customer.name}
-              className="profile-avatar"
-            />
-            <button className="btn-outline">Change Photo</button>
-          </div>
-
-          <form className="profile-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" defaultValue={customer.name} />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" defaultValue={customer.email} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Phone</label>
-                <input type="tel" defaultValue={customer.phone} />
-              </div>
-              <div className="form-group">
-                <label>Member Since</label>
-                <input
-                  type="text"
-                  defaultValue={customer.memberSince}
-                  disabled
-                />
-              </div>
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="btn-primary">
-                Save Changes
-              </button>
-              <button type="button" className="btn-outline">
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className="profile-card">
-          <h3>Change Password</h3>
-          <form className="password-form">
-            <div className="form-group">
-              <label>Current Password</label>
-              <input type="password" />
-            </div>
-            <div className="form-group">
-              <label>New Password</label>
-              <input type="password" />
-            </div>
-            <div className="form-group">
-              <label>Confirm New Password</label>
-              <input type="password" />
-            </div>
-            <button type="submit" className="btn-primary">
-              Update Password
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderContent = () => {
     switch (activeSection) {
       case "overview":
         return renderOverview();
       case "appointments":
-        return renderAppointments();
+        return (
+         <AppointmentBook />
+        );
       case "saved-services":
         return renderSavedServices();
       case "wishlist":
         return renderWishlist();
       case "feedback":
         return renderFeedback();
-      case "profile":
-        return renderProfile();
+    case "profile":
+  return <CustomerProfile customer={customer} setCustomer={setCustomer} />
       default:
         return renderOverview();
     }

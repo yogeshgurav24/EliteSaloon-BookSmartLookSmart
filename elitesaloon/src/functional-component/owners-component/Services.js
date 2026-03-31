@@ -172,14 +172,6 @@ const Service = ({
                 <img
                   src={`http://localhost:5000/uploads/serviceImages/${service.serviceImages[0]}`}
                   alt={service.serviceName}
-                  // style={{
-                  //   width: "100%",
-                  //   objectFit: "cover",
-                  //   objectPosition: "top",
-                  //   display: "block",
-                  //   borderTopLeftRadius: "15px",
-                  //   borderTopRightRadius: "15px",
-                  // }}
                 />
               ) : (
                 <FiScissors />
