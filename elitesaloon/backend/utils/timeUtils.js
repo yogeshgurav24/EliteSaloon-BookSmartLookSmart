@@ -1,17 +1,17 @@
-// convert "10:30" → minutes
+// "10:30" → minutes
 const toMinutes = (time) => {
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
 };
 
-// convert minutes → "HH:MM"
+// minutes → "HH:MM"
 const toTime = (mins) => {
     const h = String(Math.floor(mins / 60)).padStart(2, "0");
     const m = String(mins % 60).padStart(2, "0");
     return `${h}:${m}`;
 };
 
-// generate slots
+// generate slots based on duration
 const generateSlots = (start, end, duration) => {
     let slots = [];
 
@@ -24,10 +24,14 @@ const generateSlots = (start, end, duration) => {
 
         slots.push({ startTime: slotStart, endTime: slotEnd });
 
-        startMins += 15; // move by 15 mins
+        startMins += duration;; // 15 min gap sliding window
     }
 
     return slots;
 };
 
-module.exports = { toMinutes, toTime, generateSlots };
+module.exports = {
+    generateSlots,
+    toMinutes,
+    toTime
+};

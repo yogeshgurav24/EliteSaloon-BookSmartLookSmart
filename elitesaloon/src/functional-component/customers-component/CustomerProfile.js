@@ -160,16 +160,17 @@ const CustomerProfile = ({ customer, setCustomer }) => {
         <div className="profile-card">
 
           <div className="profile-header">
+
             <img
-              src={
-                formData.avatar
-                  ? `http://localhost:5000/uploads/customerProfile/${formData.avatar}?t=${Date.now()}`
-                  : "http://localhost:5000/uploads/default/defaultProfile.png"
-              }
-              alt="profile"
-              className="profile-avatar"
-              onClick={handleImageClick}
-              style={{ cursor: "pointer" }}
+                  src={
+                    !formData.avatar || formData.avatar === "defaultProfile.png"
+                      ? "http://localhost:5000/uploads/default/defaultProfile.png"
+                      : `http://localhost:5000/uploads/customerProfile/${formData.avatar}?t=${Date.now()}`
+                  }
+                  alt="profile"
+                  className="profile-avatar"
+                  onClick={handleImageClick}
+                  style={{ cursor: "pointer" }}
             />
 
             <input

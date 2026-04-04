@@ -35,7 +35,7 @@ const OwnerDashboard = () => {
   const owner =
     location.state?.owner || JSON.parse(localStorage.getItem("owner"));
   // console.log("Owner Print at Dashboard :", owner);
-
+  
   const [ownerProfile, setOwnerProfile] = useState({
     ownerName: "",
     ownerEmail: "",
@@ -492,6 +492,7 @@ const OwnerDashboard = () => {
                 alt="Profile"
                 className="od-profile-img"
               />
+           
               <div className="od-profile-info">
                 <div className="od-profile-name">{ownerProfile.ownerName}</div>
                 <div className="od-profile-role">Owner</div>

@@ -1,7 +1,7 @@
 const AppointmentModel = require("../../models/AppointmentModel");
 const StaffModel = require("../../models/StaffModel");
 const ServiceModel = require("../../models/ServiceModel");
-const { generateSlots } = require("../../utils/timeUtils");
+const { generateSlots, toMinutes } = require("../../utils/timeUtils");
 const emailSendOptimizeCode = require("../../utils/emailSendOptimizeCode");
 const OwnerModel = require("../../models/OwnerModel");
 
@@ -69,45 +69,109 @@ exports.bookAppointment = async (req, res) => {
 };
 
 
+// exports.getAvailableSlots = async (req, res) => {
+//     try {
+//         const { staffId, date, serviceIds } = req.body;
+
+//         // 1. get services
+//         const services = await ServiceModel.find({ _id: { $in: serviceIds } });
+
+//         const totalDuration = services.reduce((sum, s) => sum + s.serviceDuration, 0);
+
+//         // 2. get staff working hours (for now static)
+//         const start = "10:00";
+//         const end = "20:00";
+
+//         // 3. generate all possible slots
+//         const allSlots = generateSlots(start, end, totalDuration);
+
+//         // 4. get existing bookings
+//         const bookings = await AppointmentModel.find({
+//             staffId,
+//             appointmentDate: date,
+//             appointmentStatus: { $in: ["PENDING", "CONFIRMED"] }
+//         });
+
+//         // 5. filter slots
+//         const availableSlots = allSlots.filter(slot => {
+//             return !bookings.some(b => {
+//                 return (
+//                     slot.startTime < b.endTime &&
+//                     slot.endTime > b.startTime
+//                 );
+//             });
+//         });
+
+//         res.json({ availableSlots });
+
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// };
+
 exports.getAvailableSlots = async (req, res) => {
     try {
         const { staffId, date, serviceIds } = req.body;
 
-        // 1. get services
-        const services = await ServiceModel.find({ _id: { $in: serviceIds } });
+        //  Validation
+        if (!staffId || !date || !serviceIds || serviceIds.length === 0) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
 
-        const totalDuration = services.reduce((sum, s) => sum + s.serviceDuration, 0);
+        //  Get services
+        const services = await ServiceModel.find({
+            _id: { $in: serviceIds }
+        });
 
-        // 2. get staff working hours (for now static)
-        const start = "10:00";
-        const end = "20:00";
+        if (!services.length) {
+            return res.status(404).json({ message: "Services not found" });
+        }
 
-        // 3. generate all possible slots
-        const allSlots = generateSlots(start, end, totalDuration);
+        //  Calculate total duration
+        const totalDuration = services.reduce(
+            (sum, s) => sum + s.serviceDuration,
+            0
+        );
 
-        // 4. get existing bookings
+        //  Working hours (you can later make dynamic)
+        const workStart = "10:00";
+        const workEnd = "20:00";
+
+        // Generate all possible slots
+        const allSlots = generateSlots(workStart, workEnd, totalDuration);
+
+        //  Get booked appointments
         const bookings = await AppointmentModel.find({
             staffId,
             appointmentDate: date,
             appointmentStatus: { $in: ["PENDING", "CONFIRMED"] }
         });
 
-        // 5. filter slots
+        // DEBUG (remove later)
+        // console.log("Bookings:", bookings);
+
+        // Filter available slots (🔥 FIXED LOGIC)
         const availableSlots = allSlots.filter(slot => {
             return !bookings.some(b => {
                 return (
-                    slot.startTime < b.endTime &&
-                    slot.endTime > b.startTime
+                    toMinutes(slot.startTime) < toMinutes(b.endTime) &&
+                    toMinutes(slot.endTime) > toMinutes(b.startTime)
                 );
             });
         });
 
-        res.json({ availableSlots });
+        //  Response
+        res.json({
+            totalDuration,
+            availableSlots
+        });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };
+
 
 exports.appointmentResult = async (req,res) => {
 
