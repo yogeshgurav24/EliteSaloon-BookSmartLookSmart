@@ -42,7 +42,7 @@ import OwnerForgotPassword from "./functional-component/owners-component/OwnerFo
 import OwnerResetOtp from "./functional-component/owners-component/OwnerResetOtp";
 import OwnerResetPassword from "./functional-component/owners-component/OwnerResetPassword";
 
-
+import OwnerAppointmentDetails from "./functional-component/owners-component/OwnerAppointmentDetails";
 
 
 // Admin
@@ -75,7 +75,8 @@ function AppContent() {
     "/staffotpveryfy",
     "/ownerresetpassword",
     "bookappointment",
-    "/selectservices"
+    "/selectservices",
+    "/appointment-details"
   ];
 
   const showNavbar = !hideNavbarRoutes.includes(location.pathname);
@@ -118,6 +119,7 @@ function AppContent() {
         <Route path="/ownerotpverify" element={<OwnerOtpVerify />} />
         <Route path="/ownerlogin" element={<OwnerLogin />} />
         <Route path="/ownerdashboard" element={<OwnerDashboard />} />
+        <Route path="/appointment-details" element={<OwnerAppointmentDetails />} />
 
         {/* OWNER FORGOT PASSWORD */}
         <Route path="/ownerforgotpassword" element={<OwnerForgotPassword />} />
