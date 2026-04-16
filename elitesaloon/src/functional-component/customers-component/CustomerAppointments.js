@@ -5,24 +5,24 @@ import Swal from "sweetalert2";
 const CustomerAppointments = () => {
   // Dummy Data (In real app, use State/API)
   const [myAppointments, setMyAppointments] = useState([
-    {
-      _id: "1",
-      appointmentDate: "2026-04-07",
-      startTime: "10:00",
-      endTime: "11:00",
-      services: [{ serviceName: "Hair Cut" }],
-      totalPrice: 450,
-      appointmentStatus: "CONFIRMED"
-    },
-    {
-      _id: "2",
-      appointmentDate: "2026-04-10",
-      startTime: "14:00",
-      endTime: "15:00",
-      services: [{ serviceName: "Facial" }, { serviceName: "Shaving" }],
-      totalPrice: 1200,
-      appointmentStatus: "PENDING"
-    }
+    // {
+    //   _id: "1",
+    //   appointmentDate: "2026-04-07",
+    //   startTime: "10:00",
+    //   endTime: "11:00",
+    //   services: [{ serviceName: "Hair Cut" }],
+    //   totalPrice: 450,
+    //   appointmentStatus: "CONFIRMED"
+    // },
+    // {
+    //   _id: "2",
+    //   appointmentDate: "2026-04-10",
+    //   startTime: "14:00",
+    //   endTime: "15:00",
+    //   services: [{ serviceName: "Facial" }, { serviceName: "Shaving" }],
+    //   totalPrice: 1200,
+    //   appointmentStatus: "PENDING"
+    // }
   ]);
 
   // Cancel Function

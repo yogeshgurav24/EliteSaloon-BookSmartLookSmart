@@ -33,8 +33,6 @@ const CustomerDashboard = () => {
 
   console.log("FINAL CUSTOMER:", customer);
 
- 
-
   const [appointments] = useState([]);
 
   //session

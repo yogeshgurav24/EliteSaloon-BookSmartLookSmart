@@ -239,5 +239,22 @@ exports.getOwnersAppointments = async (req, res) => {
   }
 };
 
+exports.getCustomersAppointments = async (req, res) => {
+  try {
+    
+    const { customerId } = req.params;
+    const appointments = await AppointmentModel.find({ customerId: customerId });
+
+    console.log("Particular Customer Appointments :", appointments);
+
+    res.json({ appointments });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching appointments" });
+  }
+
+};
+
 
 

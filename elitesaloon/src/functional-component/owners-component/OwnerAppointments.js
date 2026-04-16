@@ -224,11 +224,9 @@ const OwnerAppointments = () => {
     setLoading(true);
 
     try {
-        // const res = await axios.get(
-        //   `http://localhost:5000/appointment/get-appointment/${ownerId}`
-        // );
-
-        const res = "Hello";
+        const res = await axios.get(
+          `http://localhost:5000/appointment/get-appointment/${ownerId}`
+        );
 
       console.log("Owner Appointments API:", res.data);
 
@@ -271,7 +269,8 @@ const OwnerAppointments = () => {
 
     try {
       const res = await axios.put(
-        "http://localhost:5000/appointment-result",
+        // "http://localhost:5000/appointment-result",
+        "http://localhost:5000/appointment/appointment-result",
         {
           appointmentId,
           status,
