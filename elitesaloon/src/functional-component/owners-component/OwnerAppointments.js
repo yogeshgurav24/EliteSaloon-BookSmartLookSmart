@@ -224,9 +224,11 @@ const OwnerAppointments = () => {
     setLoading(true);
 
     try {
-      const res = await axios.get(
-        `http://localhost:5000/owner-appointments/${ownerId}`
-      );
+        // const res = await axios.get(
+        //   `http://localhost:5000/appointment/get-appointment/${ownerId}`
+        // );
+
+        const res = "Hello";
 
       console.log("Owner Appointments API:", res.data);
 
