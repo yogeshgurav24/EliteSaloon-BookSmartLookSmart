@@ -42,9 +42,6 @@ import OwnerForgotPassword from "./functional-component/owners-component/OwnerFo
 import OwnerResetOtp from "./functional-component/owners-component/OwnerResetOtp";
 import OwnerResetPassword from "./functional-component/owners-component/OwnerResetPassword";
 
-
-
-
 // Admin
 import AdminDashboard from "./functional-component/admin-component/AdminDashboard";
 import StaffOtpVerify from "./functional-component/owners-component/StaffOtpVerify";
