@@ -3,31 +3,22 @@
 /* CSS Variables */
 .customer-dashboard {
   --primary-gold: #d4af37;
-  --mobile-overlay-bg: rgba(0, 0, 0, 0.5);
-  --hamburger-color: var(--charcoal);
-  --sidebar-z: 1001;
-
   --secondary-gold: #b8962e;
   --rose-gold: #b76e79;
   --burgundy: #800020;
   --charcoal: #36454f;
-  --slate-gray: #708090;
   --soft-gray: #e8e8e8;
   --light-bg: #fafafa;
   --off-white: #f8f5f2;
-  --text-dark: #2d2d2d;
-  --text-medium: #555555;
-  --text-light: #ffffff;
-  --text-muted: #888888;
-  --accent-teal: #008080;
-  --transition: all 0.3s ease;
+  --text-muted: #888;
+
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.12);
-  --radius-sm: 8px;
+
   --radius-md: 12px;
   --radius-lg: 20px;
-  --animate-delay: 0.1s;
-  --ripple-color: rgba(255, 255, 255, 0.6);
+
+  font-family: "Inter", sans-serif;
 }
 
 /* Main Layout */
@@ -188,11 +179,6 @@
   flex: 1;
   margin-left: 300px;
   padding: 80px 40px 40px;
-  width: calc(100vw - 300px);
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
 }
 
 .mobile-menu-toggle {
@@ -289,21 +275,14 @@
 }
 
 .stat-card {
-  background: var(--text-light);
-  padding: 25px;
+  background: #fff;
+  padding: 22px;
   border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 15px;
   box-shadow: var(--shadow-sm);
-  transition:
-    var(--transition),
-    transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  min-height: 140px;
-  position: relative;
-  animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: calc(var(--animate-delay) * var(--order, 1));
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  transition: 0.3s;
 }
 
 @keyframes fadeInUp {
@@ -331,23 +310,17 @@
 }
 
 .stat-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-md);
-}
-
-.stat-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-md);
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
 }
 
 .stat-icon.upcoming {
@@ -376,7 +349,7 @@
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--charcoal);
 }
@@ -990,7 +963,6 @@
   }
 }
 
-
 @media (max-width: 992px) {
   .mobile-menu-toggle {
     display: block;
@@ -1061,9 +1033,8 @@
   }
 }
 
-
 /*  appoinmetnt book form*/
-/* ===== BOOKING MODAL ===== *//* ===== BOOKING MODAL (Overlay) ===== */
+/* ===== BOOKING MODAL ===== */ /* ===== BOOKING MODAL (Overlay) ===== */
 .booking-modal {
   position: fixed;
   top: 0;
@@ -1261,17 +1232,25 @@ button[type="button"].btn-primary {
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive Fix */
 @media (max-width: 600px) {
-  .booking-card { padding: 25px; }
-  .back-arrow span { display: none; } /* Mobile pe sirf arrow dikhega */
+  .booking-card {
+    padding: 25px;
+  }
+  .back-arrow span {
+    display: none;
+  } /* Mobile pe sirf arrow dikhega */
 }
-
-
 
 /* =========================================
    ELITE SALOON MODERN TABLE CSS - UPDATED
@@ -1367,9 +1346,9 @@ button[type="button"].btn-primary {
 /* 7. Service Tags (Optimized for 5+ Services) */
 .service-tags {
   display: flex;
-  flex-wrap: wrap;    /* Services zyada hone par niche line mein jayengi */
+  flex-wrap: wrap; /* Services zyada hone par niche line mein jayengi */
   gap: 6px;
-  max-width: 300px;   /* Column ko bahut zyada choda hone se rokega */
+  max-width: 300px; /* Column ko bahut zyada choda hone se rokega */
 }
 
 .tag {
@@ -1401,9 +1380,18 @@ button[type="button"].btn-primary {
   text-align: center;
 }
 
-.status-pill.confirmed { background: #e6fcf5; color: #0ca678; }
-.status-pill.pending { background: #fff9db; color: #f08c00; }
-.status-pill.cancelled { background: #fff5f5; color: #fa5252; }
+.status-pill.confirmed {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+.status-pill.pending {
+  background: #fff9db;
+  color: #f08c00;
+}
+.status-pill.cancelled {
+  background: #fff5f5;
+  color: #fa5252;
+}
 
 /* 9. Action Buttons */
 .cancel-action-btn {
@@ -1430,4 +1418,141 @@ button[type="button"].btn-primary {
   font-size: 12px;
   color: #adb5bd;
   font-style: italic;
+}
+
+/* ===== CUSTOMER SERVICE CARDS ===== */
+.customer-service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.customer-service-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: 0.3s;
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.customer-service-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.service-body {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-body h3 {
+  font-size: 16px;
+  color: var(--charcoal);
+  margin-bottom: 5px;
+}
+
+.service-body .desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+  margin-bottom: 10px;
+}
+
+/* Meta */
+.service-meta {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--burgundy);
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.service-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.view-btn,
+.book-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+
+.view-btn {
+  background: #f1f3f5;
+  color: #333;
+}
+
+.book-btn {
+  background: var(--burgundy);
+  color: #fff;
+}
+
+.book-btn:hover {
+  background: #600018;
+}
+shop-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--burgundy);
+  text-transform: uppercase;
+}
+.shop-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--burgundy);
+  display: block;
+}
+
+.owner-email,
+.service-address {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.filter-bar input,
+.filter-bar select {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+  border-color: var(--burgundy);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.08);
 }

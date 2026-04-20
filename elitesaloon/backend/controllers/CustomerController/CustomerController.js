@@ -482,6 +482,6 @@ exports.changeCustomerPassword = async (req, res) => {
 };
 
 
-exports.getServiceForCustomerByPin = async (req,res)=>{
+// exports.getServiceForCustomerByPin = async (req,res)=>{
 
-}
+// }
