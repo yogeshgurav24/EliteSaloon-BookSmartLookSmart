@@ -3,7 +3,7 @@ const routes  = express.Router();
 // const upload = require('../middleware/upload');
 const imageUpload = require("../utils/imageUpload");
 const CustomerController = require('../controllers/CustomerController/CustomerController');
-// const { cancelAppointmentByCustomer } = require("../controllers/CustomerController/CustomerController");
+const Customer = require('../models/CustomerModel');
 
 // routes.post('/register', upload.single('customerProfileImage'), CustomerController.registerCustomer);
 routes.post('/register', CustomerController.registerCustomer);
@@ -25,10 +25,8 @@ routes.post(
   CustomerController.changeCustomerPassword
 );
 
-// routes.get("/get-services-for-customer",);
-
-//yogesh deore 
-routes.put("/cancel-appointment", CustomerController.cancelAppointmentByCustomer);
+routes.get("/get-product-customer/:customerPincode", CustomerController.getProductsForCustomerByPin);
+routes.get("/get-service-customer/:customerPincode", CustomerController.getServiceForCustomerByPin);
 
 module.exports = routes;
 
