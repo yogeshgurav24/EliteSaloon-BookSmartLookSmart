@@ -488,6 +488,7 @@ exports.changeCustomerPassword = async (req, res) => {
 
 exports.getServiceForCustomerByPin = async (req,res)=>{
   try {
+   
     const { customerPincode } = req.params;
 
     if (!customerPincode) {
@@ -498,10 +499,11 @@ exports.getServiceForCustomerByPin = async (req,res)=>{
     }
 
     const owners = await OwnerModel.find({
-      ownerShopPincode: customerPincode,
+      ownerShopPincode: String(customerPincode),
       ownerAccountStatus: "ACTIVE",  
       ownerApprovedStatus: "APPROVE"
     });
+    console.log("OWNERS FOUND:", owners); 
 
     if (owners.length === 0) {
       return res.status(404).json({
@@ -514,7 +516,7 @@ exports.getServiceForCustomerByPin = async (req,res)=>{
 
     const services = await ServiceModel.find({
       ownerId: { $in: ownerIds }
-    }).populate("ownerId", "ownerShopName ownerShopCity ownerShopPincode");
+    }).populate("ownerId", "ownerShopName ownerShopStreet ownerShopDistrict ownerShopCity ownerShopPincode ownerEmail")
 
     res.status(200).json({
       success: true,
@@ -543,6 +545,8 @@ exports.getProductsForCustomerByPin = async (req,res)=>{
         message: "Customer pincode is required"
       });
     }
+    
+
 
     const owners = await OwnerModel.find({
       ownerShopPincode: customerPincode,
@@ -564,7 +568,8 @@ exports.getProductsForCustomerByPin = async (req,res)=>{
 
     const products = await ProductModel.find({
       ownerId: { $in: ownerIds }
-    }).populate("ownerId", "ownerShopName ownerShopCity ownerShopPincode");
+    }).populate("ownerId", "ownerShopName ownerEmail ownerShopCity ownerShopPincode")
+    // .populate("ownerId", "ownerShopName ownerShopCity ownerShopPincode");
     
     res.status(200).json({
       success: true,
