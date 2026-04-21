@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { customerFindUsingEmail } = require("./CustomerOptimizeCode");
 const  emailSendOptimizeCode = require("../../utils/emailSendOptimizeCode");
 const generateOTP = require('../../utils/generateOTP');
+const AppointmentModel = require("../../models/AppointmentModel");
 
 /**
  * Author : Yogesh Badgujar
@@ -485,3 +486,47 @@ exports.changeCustomerPassword = async (req, res) => {
 exports.getServiceForCustomerByPin = async (req,res)=>{
 
 }
+
+
+//create By yogesh deore
+exports.cancelAppointmentByCustomer = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    if (!appointmentId) {
+      return res.status(400).json({
+        message: "Appointment ID required",
+      });
+    }
+
+    const appointment = await AppointmentModel.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+    if (appointment.appointmentStatus === "COMPLETED") {
+      return res.status(400).json({
+        message: "Cannot cancel completed appointment",
+      });
+    }
+
+    appointment.appointmentStatus = "CANCELLED";
+    await appointment.save();
+
+    res.json({
+      message: "Appointment cancelled successfully",
+      appointment,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error cancelling appointment",
+    });
+  }
+};
+
+// ------------------------------------------------------------
