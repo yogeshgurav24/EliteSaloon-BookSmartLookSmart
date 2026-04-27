@@ -1,8 +1,12 @@
 const CustomerModel = require("../../models/CustomerModel");
+const OwnerModel = require("../../models/OwnerModel");
+const ProductModel = require("../../models/ProductModel");
+const ServiceModel = require("../../models/ServiceModel");
 const bcrypt = require("bcrypt");
 const { customerFindUsingEmail } = require("./CustomerOptimizeCode");
 const  emailSendOptimizeCode = require("../../utils/emailSendOptimizeCode");
 const generateOTP = require('../../utils/generateOTP');
+const AppointmentModel = require("../../models/AppointmentModel");
 
 /**
  * Author : Yogesh Badgujar
@@ -337,6 +341,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+
 /**
  * add image controller
  * @param {*} req
@@ -366,6 +371,7 @@ exports.uploadProfileImage = async (req, res) => {
 
     res.status(200).json({
       message: "Profile image updated successfully",
+       customerProfileImage: customer.customerProfileImage,
     });
   } catch (error) {
     res.status(500).json({
@@ -374,3 +380,263 @@ exports.uploadProfileImage = async (req, res) => {
     });
   }
 };
+
+
+exports.updateCustomerProfile = async (req, res) => {
+  try {
+    const customerId = req.params.id;
+
+    const {
+      customerName,
+      customerMobile,
+      customerStreet,
+      customerPincode,
+      customerBlock,
+      customerCity,
+      customerDistrict,
+      customerState,
+    } = req.body;
+
+    const customer = await CustomerModel.findById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    if (customerName) customer.customerName = customerName;
+    if (customerMobile) customer.customerMobile = customerMobile;
+    if (customerStreet) customer.customerStreet = customerStreet;
+    if (customerPincode) customer.customerPincode = customerPincode;
+    if (customerBlock) customer.customerBlock = customerBlock;
+    if (customerCity) customer.customerCity = customerCity;
+    if (customerDistrict) customer.customerDistrict = customerDistrict;
+    if (customerState) customer.customerState = customerState;
+
+  
+    if (req.file) {
+      customer.customerProfileImage = req.file.filename;
+    }
+
+    customer.customerUpdatedAt = Date.now();
+
+    await customer.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Customer profile updated successfully",
+      data: customer,
+    });
+  } catch (error) {
+    console.error("Update Customer Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.changeCustomerPassword = async (req, res) => {
+  try {
+    const customerId = req.params.id;
+
+    const { currentPassword, newPassword } = req.body;
+
+    const customer = await CustomerModel.findById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      customer.customerPassword
+    );
+
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    customer.customerPassword = hashedPassword;
+    customer.customerUpdatedAt = Date.now();
+
+    await customer.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Change Password Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+
+exports.getServiceForCustomerByPin = async (req,res)=>{
+  try {
+   
+    const { customerPincode } = req.params;
+
+    if (!customerPincode) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer pincode is required"
+      });
+    }
+
+    const owners = await OwnerModel.find({
+      ownerShopPincode: String(customerPincode),
+      ownerAccountStatus: "ACTIVE",  
+      ownerApprovedStatus: "APPROVE"
+    });
+    console.log("OWNERS FOUND:", owners); 
+
+    if (owners.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No salons found in this area"
+      });
+    }
+ 
+    const ownerIds = owners.map(owner => owner._id);
+
+    const services = await ServiceModel.find({
+      ownerId: { $in: ownerIds }
+    }).populate("ownerId", "ownerShopName ownerShopStreet ownerShopDistrict ownerShopCity ownerShopPincode ownerEmail")
+
+    res.status(200).json({
+      success: true,
+      totalOwners: owners.length,
+      totalServices: services.length,
+      data: services
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+  }
+}
+
+exports.getProductsForCustomerByPin = async (req,res)=>{
+  try {
+   
+    const { customerPincode } = req.params;
+
+    if (!customerPincode) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer pincode is required"
+      });
+    }
+    
+
+
+    const owners = await OwnerModel.find({
+      ownerShopPincode: customerPincode,
+      ownerAccountStatus: "ACTIVE",   
+      ownerApprovedStatus: "APPROVE" 
+    });
+
+    // console.log("Owners found for pincode " + customerPincode + " : " + owners.length + " owners" + owners);
+
+    if (owners.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No shops found in this area"
+      });
+    }
+
+    // Extract owner IDs
+    const ownerIds = owners.map(owner => owner._id);
+
+    const products = await ProductModel.find({
+      ownerId: { $in: ownerIds }
+    }).populate("ownerId", "ownerShopName ownerEmail ownerShopCity ownerShopPincode")
+    // .populate("ownerId", "ownerShopName ownerShopCity ownerShopPincode");
+    
+    res.status(200).json({
+      success: true,
+      totalOwners: owners.length,
+      totalProducts: products.length,
+      data: products
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+  }
+
+}
+
+
+//create By yogesh deore
+exports.cancelAppointmentByCustomer = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    console.log("Appointment For cancel :", appointmentId);
+
+    if (!appointmentId) {
+      return res.status(400).json({
+        message: "Appointment ID required",
+      });
+    }
+
+    const appointment = await AppointmentModel.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+    if (appointment.appointmentStatus === "COMPLETED") {
+      return res.status(400).json({
+        message: "Cannot cancel completed appointment",
+      });
+    }
+
+    appointment.appointmentStatus = "CANCELLED";
+    await appointment.save();
+
+    const ownerEmail = await OwnerModel.findById(appointment.ownerId).select("ownerEmail");
+    const customerName = await CustomerModel.findById(appointment.customerId).select("customerName");
+
+    // Send email notification to owner about appointment cancellation
+    let subject = "Appointment Cancellation Notification";
+    let message = `Dear Owner,\n\nThe appointment with Name ${customerName.customerName} has been cancelled for the Date: ${appointment.appointmentDate}and Time: ${appointment.startTime} by the customer.\n\nBest regards,\nElite Saloon Team`;
+    await emailSendOptimizeCode(ownerEmail.ownerEmail, subject, message);
+
+    res.json({
+      message: "Appointment cancelled successfully",
+      appointment,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error cancelling appointment",
+    });
+  }
+};
+

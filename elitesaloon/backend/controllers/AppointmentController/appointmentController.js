@@ -4,6 +4,7 @@ const ServiceModel = require("../../models/ServiceModel");
 const { generateSlots, toMinutes } = require("../../utils/timeUtils");
 const emailSendOptimizeCode = require("../../utils/emailSendOptimizeCode");
 const OwnerModel = require("../../models/OwnerModel");
+const CustomerModel = require("../../models/CustomerModel");
 
 exports.bookAppointment = async (req, res) => {
   try {
@@ -57,50 +58,21 @@ exports.bookAppointment = async (req, res) => {
     });
 
     res.json({ message: "Booking successful", appointment });
+
+    const owner = await OwnerModel.findById(ownerId).select("ownerEmail ownerName"); 
+    const customer = await CustomerModel.findById(customerId).select("customerName customerEmail");
+    let subject = "New Appointment Booked";
+    let message = `Dear ${owner.ownerName},\n\nYou have a new appointment booked by ${customer.customerName} on ${date} at ${startTime} for the following services:\n\n`;
+    services.forEach((s) => {
+      message += `- ${s.serviceName} (${s.serviceDuration} mins, ₹${s.servicePrice})\n`;
+    }); 
+
+    await emailSendOptimizeCode(owner.ownerEmail, subject, message);
+   
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-// exports.getAvailableSlots = async (req, res) => {
-//     try {
-//         const { staffId, date, serviceIds } = req.body;
-
-//         // 1. get services
-//         const services = await ServiceModel.find({ _id: { $in: serviceIds } });
-
-//         const totalDuration = services.reduce((sum, s) => sum + s.serviceDuration, 0);
-
-//         // 2. get staff working hours (for now static)
-//         const start = "10:00";
-//         const end = "20:00";
-
-//         // 3. generate all possible slots
-//         const allSlots = generateSlots(start, end, totalDuration);
-
-//         // 4. get existing bookings
-//         const bookings = await AppointmentModel.find({
-//             staffId,
-//             appointmentDate: date,
-//             appointmentStatus: { $in: ["PENDING", "CONFIRMED"] }
-//         });
-
-//         // 5. filter slots
-//         const availableSlots = allSlots.filter(slot => {
-//             return !bookings.some(b => {
-//                 return (
-//                     slot.startTime < b.endTime &&
-//                     slot.endTime > b.startTime
-//                 );
-//             });
-//         });
-
-//         res.json({ availableSlots });
-
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
 
 exports.getAvailableSlots = async (req, res) => {
   try {
@@ -260,3 +232,42 @@ exports.getSalons = async (req, res) => {
     });
   }
 };
+
+exports.getOwnersAppointments = async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+
+    const appointments = await AppointmentModel.find({ ownerId: ownerId })
+      .populate("customerId", "customerName customerEmail")
+      .populate("staffId", "staffName staffEmail")
+      .populate("ownerId", "ownerName ownerShopName")
+      .populate("services.serviceId", "serviceName servicePrice");
+
+    console.log("Particular Owner Appointments :", appointments);
+
+    res.json({ appointments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching appointments" });
+  }
+};
+
+exports.getCustomersAppointments = async (req, res) => {
+  try {
+    
+    const { customerId } = req.params;
+    const appointments = await AppointmentModel.find({ customerId: customerId });
+
+    console.log("Particular Customer Appointments :", appointments);
+
+    res.json({ appointments });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching appointments" });
+  }
+
+};
+
+
+

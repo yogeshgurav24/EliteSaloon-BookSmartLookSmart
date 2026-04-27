@@ -20,6 +20,16 @@ const AppointmentSchema = new mongoose.Schema({
         required: true
     },
 
+    //yogesh Deore
+        paymentId: String,
+        orderId: String,
+
+        paymentStatus: {
+        type: String,
+        default: "PENDING"
+        },
+    // --------------------------------------------
+
     services: [
         {
             serviceId: mongoose.Schema.Types.ObjectId,
@@ -40,6 +50,8 @@ const AppointmentSchema = new mongoose.Schema({
     totalDuration: Number,
     totalPrice: Number,
 
+   
+
     appointmentStatus: {
         type: String,
         enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"],
@@ -49,3 +61,4 @@ const AppointmentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model("Appointment", AppointmentSchema);
+
